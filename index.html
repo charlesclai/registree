@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>regisTree | Simple Cash Proxy Registry</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Supabase JS Client Library -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
     tailwind.config = {
       theme: {
@@ -181,15 +183,35 @@
 
   <!-- Application Logic JavaScript -->
   <script>
-    // State Initialization with localStorage Persistence
-    let registryData = loadState() || {
+    // Supabase Credentials
+    const SUPABASE_URL = 'https://kzifhsejyezhkmpeyexh.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt6aWZoc2VqeWV6aGttcGV5ZXhoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgwOTIxMjIsImV4cCI6MjEwMzY2ODEyMn0.CDBZE-3ZTO-wBeewYmPsAzmDyRD65vXTTV6g30CNGn0';
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    // Get unique registry ID from URL query string or assign local default
+    function getRegistryId() {
+      const params = new URLSearchParams(window.location.search);
+      let id = params.get('id');
+      if (!id) {
+        id = localStorage.getItem('regisTree_active_id');
+        if (!id) {
+          id = 'registry-' + Math.random().toString(36).substring(2, 9);
+          localStorage.setItem('regisTree_active_id', id);
+        }
+      }
+      return id;
+    }
+
+    const currentRegistryId = getRegistryId();
+
+    // Registry Data State
+    let registryData = {
       userName: "",
       venmoHandle: "",
       currentSort: "default",
       items: []
     };
 
-    // View Mode State: 'owner' or 'buyer'
     let currentViewMode = 'owner';
 
     // DOM Elements
@@ -226,20 +248,48 @@
       return trimmed;
     }
 
-    // Local Storage Helpers
-    function saveState() {
-      localStorage.setItem('regisTree_data', JSON.stringify(registryData));
+    // Database Sync Helpers
+    async function loadState() {
+      try {
+        const { data, error } = await supabaseClient
+          .from('registries')
+          .select('*')
+          .eq('id', currentRegistryId)
+          .single();
+
+        if (data && !error) {
+          registryData = {
+            userName: data.user_name || "",
+            venmoHandle: data.venmo_handle || "",
+            currentSort: data.current_sort || "default",
+            items: data.items || []
+          };
+        }
+      } catch (err) {
+        console.error("Error loading state from Supabase:", err);
+      }
+      renderRegistry();
     }
 
-    function loadState() {
-      const saved = localStorage.getItem('regisTree_data');
-      return saved ? JSON.parse(saved) : null;
+    async function saveState() {
+      try {
+        await supabaseClient.from('registries').upsert({
+          id: currentRegistryId,
+          user_name: registryData.userName,
+          venmo_handle: registryData.venmoHandle,
+          current_sort: registryData.currentSort,
+          items: registryData.items,
+          updated_at: new Date()
+        });
+      } catch (err) {
+        console.error("Error saving state to Supabase:", err);
+      }
     }
 
-    // View Mode Routing & Initialization
+    // View Mode Routing
     function detectViewMode() {
       const urlParams = new URLSearchParams(window.location.search);
-      if (urlParams.get('view') === 'buyer' || window.location.hash === '#buyer') {
+      if (urlParams.get('view') === 'buyer') {
         currentViewMode = 'buyer';
       } else {
         currentViewMode = 'owner';
@@ -250,10 +300,10 @@
     function toggleViewMode() {
       if (currentViewMode === 'owner') {
         currentViewMode = 'buyer';
-        window.history.replaceState(null, '', '?view=buyer');
+        window.history.replaceState(null, '', `?id=${currentRegistryId}&view=buyer`);
       } else {
         currentViewMode = 'owner';
-        window.history.replaceState(null, '', window.location.pathname);
+        window.history.replaceState(null, '', `?id=${currentRegistryId}`);
       }
       applyViewModeUI();
       renderRegistry();
@@ -285,7 +335,7 @@
 
     // Share Registry Link Action
     function shareRegistry() {
-      const shareUrl = `${window.location.origin}${window.location.pathname}?view=buyer`;
+      const shareUrl = `${window.location.origin}${window.location.pathname}?id=${currentRegistryId}&view=buyer`;
       navigator.clipboard.writeText(shareUrl).then(() => {
         showToast("Shareable buyer link copied to clipboard!");
       }).catch(() => {
@@ -357,7 +407,7 @@
       }
     }
 
-    // Flexible URL Metadata Extractor
+    // URL Metadata Extractor
     function extractMetadataFromUrl(urlString) {
       try {
         const normalized = normalizeUrl(urlString);
@@ -478,7 +528,7 @@
       });
     }
 
-    // Add Item Form Handler (Owner Only)
+    // Add Item Form Handler
     addItemForm.addEventListener('submit', (e) => {
       e.preventDefault();
       const urlInput = document.getElementById('itemUrl');
@@ -512,7 +562,7 @@
       }, 300);
     });
 
-    // Delete Item Actions (Owner Only)
+    // Delete Item Actions
     function deleteRegistryItem(id) {
       if (currentViewMode !== 'owner') return;
 
@@ -530,7 +580,7 @@
       deleteRegistryItem(id);
     }
 
-    // Edit Modal Logic (Owner Only)
+    // Edit Modal Logic
     function openEditModal(id) {
       if (currentViewMode !== 'owner') return;
 
@@ -588,16 +638,16 @@
       }
     }
 
-    // Utility: Escape Special Characters
+    // Helper: Escape Special Characters
     function escapeHtml(str) {
       return str.replace(/[&<>"']/g, function(m) {
         return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[m];
       });
     }
 
-    // Initial Execution
+    // Initial Setup
     detectViewMode();
-    renderRegistry();
+    loadState();
   </script>
 </body>
 </html>
