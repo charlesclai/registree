@@ -337,7 +337,7 @@
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt6aWZoc2VqeWV6aGttcGV5ZXhoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgwOTIxMjIsImV4cCI6MjEwMzY2ODEyMn0.CDBZE-3ZTO-wBeewYmPsAzmDyRD65vXTTV6g30CNGn0';
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    // EmailJS Updated Credentials
+    // EmailJS Credentials
     const EMAILJS_PUBLIC_KEY = 'i0PaEguCvTZW1B8BL';
     const EMAILJS_SERVICE_ID = 'service_a8v7pwe';
     const EMAILJS_TEMPLATE_ID = 'template_jglgtiq';
@@ -722,7 +722,7 @@
       }
     });
 
-    // Forgot Password & Lockout Recovery Handler
+    // Forgot Password & Lockout Recovery Handler (Standalone and clickable)
     async function handleForgotPassword() {
       const emailInput = document.getElementById('loginEmail').value.trim().toLowerCase();
       
@@ -737,41 +737,40 @@
     }
 
     async function promptPasswordResetEmail(targetEmail) {
-      if (confirm(`Would you like your passcode sent to ${targetEmail}?`)) {
-        try {
-          const { data, error } = await supabaseClient
-            .from('registries')
-            .select('id, user_name, passcode')
-            .eq('user_email', targetEmail);
+      console.log("Triggering passcode reset for:", targetEmail);
+      
+      try {
+        const { data, error } = await supabaseClient
+          .from('registries')
+          .select('id, user_name, passcode')
+          .eq('user_email', targetEmail);
 
-          if (data && data.length > 0 && !error) {
-            const userRecord = data[0];
+        if (data && data.length > 0 && !error) {
+          const userRecord = data[0];
+          console.log("Found registry record. Sending email via EmailJS...");
 
-            // Send actual email via EmailJS with the correctly mapped {{email}} variable
-            if (typeof emailjs !== 'undefined') {
-              await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
-                to_name: userRecord.user_name || 'User',
-                email: targetEmail, 
-                passcode: userRecord.passcode
-              });
-              showToast(`Passcode email sent to ${targetEmail}`);
-            } else {
-              showToast("EmailJS is not configured properly.");
-            }
+          const templateParams = {
+            to_name: userRecord.user_name || 'User',
+            email: targetEmail,
+            passcode: userRecord.passcode
+          };
 
-            // Unlocks the account so the user can log in after checking their email
-            await supabaseClient.from('registries').update({
-              failed_attempts: 0,
-              is_locked: false
-            }).eq('id', userRecord.id);
+          const response = await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, templateParams);
+          console.log("EmailJS SUCCESS:", response.status, response.text);
+          showToast(`Passcode email sent to ${targetEmail}`);
 
-          } else {
-            showToast("No account found matching that email.");
-          }
-        } catch (err) {
-          console.error("Error triggering password email:", err);
-          showToast("Failed to send recovery email. Please try again.");
+          await supabaseClient.from('registries').update({
+            failed_attempts: 0,
+            is_locked: false
+          }).eq('id', userRecord.id);
+
+        } else {
+          console.warn("No Supabase account matched email:", targetEmail);
+          showToast("No account found matching that email.");
         }
+      } catch (err) {
+        console.error("Error in promptPasswordResetEmail:", err);
+        showToast("Failed to send recovery email. Check console log.");
       }
     }
 
