@@ -7,6 +7,8 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Supabase JS Client Library -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <!-- EmailJS Library for sending actual emails -->
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
   <script>
     tailwind.config = {
       theme: {
@@ -164,6 +166,31 @@
 
   </main>
 
+  <!-- GIFTER NAME MODAL -->
+  <div id="gifterModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm hidden flex items-center justify-center z-50 p-4">
+    <div class="bg-white rounded-2xl max-w-sm w-full p-6 shadow-xl border border-slate-100 space-y-4">
+      <div class="text-center">
+        <h3 class="text-lg font-semibold text-slate-900">Send Gift via Venmo</h3>
+        <p class="text-xs text-slate-500 mt-1">Enter your name so the recipient knows who funded this gift.</p>
+      </div>
+
+      <form id="gifterForm" class="space-y-3">
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1">Your Name</label>
+          <input type="text" id="gifterNameInput" placeholder="Anonymous" class="w-full px-3 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-forest-600 text-sm" />
+        </div>
+
+        <div class="flex gap-2 pt-2">
+          <button type="button" onclick="closeGifterModal()" class="w-full py-2.5 rounded-xl text-sm font-medium text-slate-600 hover:bg-slate-100 transition">Cancel</button>
+          <button type="submit" class="w-full py-2.5 rounded-xl text-sm font-medium bg-forest-600 hover:bg-forest-700 text-white transition flex items-center justify-center gap-1">
+            <span>Continue to Venmo</span>
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <!-- AUTHENTICATION MODAL -->
   <div id="authModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm hidden flex items-center justify-center z-50 p-4">
     <div class="bg-white rounded-2xl max-w-sm w-full p-6 shadow-xl border border-slate-100 space-y-4">
@@ -235,7 +262,10 @@
           </div>
 
           <div>
-            <label class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1">Passcode</label>
+            <div class="flex justify-between items-center mb-1">
+              <label class="block text-xs font-semibold text-slate-600 uppercase tracking-wider">Passcode</label>
+              <button type="button" onclick="handleForgotPassword()" class="text-xs font-semibold text-forest-600 hover:underline">Forgot passcode?</button>
+            </div>
             <div class="relative">
               <input type="password" id="loginPasscode" required placeholder="Enter passcode" class="w-full px-3 py-2 pr-10 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-forest-600 text-sm" />
               <button type="button" onclick="togglePasswordVisibility('loginPasscode', 'eyeIconLogin')" class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600">
@@ -247,7 +277,7 @@
             </div>
           </div>
 
-          <p id="loginError" class="text-xs text-red-600 hidden font-medium text-center">Invalid email or passcode.</p>
+          <p id="loginError" class="text-xs text-red-600 hidden font-medium text-center"></p>
 
           <div class="flex gap-2 pt-2">
             <button type="button" id="loginCancelBtn" onclick="closeAuthModal()" class="w-full py-2.5 rounded-xl text-sm font-medium text-slate-600 hover:bg-slate-100 transition">Cancel</button>
@@ -307,10 +337,20 @@
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt6aWZoc2VqeWV6aGttcGV5ZXhoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgwOTIxMjIsImV4cCI6MjEwMzY2ODEyMn0.CDBZE-3ZTO-wBeewYmPsAzmDyRD65vXTTV6g30CNGn0';
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+    // EmailJS Credentials Configured
+    const EMAILJS_PUBLIC_KEY = 'i0PaEguCvTZW1B8BL';
+    const EMAILJS_SERVICE_ID = 'service_r0ogpgp';
+    const EMAILJS_TEMPLATE_ID = 'template_jglgtiq';
+
+    if (typeof emailjs !== 'undefined') {
+      emailjs.init(EMAILJS_PUBLIC_KEY);
+    }
+
     // Dynamic State
     let activeRegistryId = null;
     let isOwnerLoggedIn = false;
     let currentViewMode = 'buyer';
+    let activeFundingItemId = null;
 
     let registryData = {
       userName: "",
@@ -332,10 +372,14 @@
     const editModal = document.getElementById('editModal');
     const editItemForm = document.getElementById('editItemForm');
 
+    const gifterModal = document.getElementById('gifterModal');
+    const gifterForm = document.getElementById('gifterForm');
+
     const authModal = document.getElementById('authModal');
     const loginViewContainer = document.getElementById('loginViewContainer');
     const signUpViewContainer = document.getElementById('signUpViewContainer');
     const signUpError = document.getElementById('signUpError');
+    const loginError = document.getElementById('loginError');
     const signUpSubmitBtn = document.getElementById('signUpSubmitBtn');
     const loginSubmitBtn = document.getElementById('loginSubmitBtn');
     
@@ -362,11 +406,14 @@
       return trimmed;
     }
 
-    // Generate random 12-char hex token for URL privacy
     function generateRandomSlug() {
       const array = new Uint8Array(6);
       window.crypto.getRandomValues(array);
       return Array.from(array, byte => byte.toString(16).padStart(2, '0')).join('');
+    }
+
+    function isMobileDevice() {
+      return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
     }
 
     function togglePasswordVisibility(inputId, iconId) {
@@ -426,7 +473,6 @@
         resetRegistryData();
       }
 
-      // Verify active local session matches loaded registry
       const localOwnerEmail = localStorage.getItem('regisTree_owner_email');
       if (localOwnerEmail && registryData.userEmail && localOwnerEmail.toLowerCase().trim() === registryData.userEmail.toLowerCase().trim()) {
         isOwnerLoggedIn = true;
@@ -438,7 +484,6 @@
       applyViewModeUI();
       renderRegistry();
 
-      // Show Auth Modal if visiting root directly without a registry ID
       if (!activeRegistryId) {
         openAuthModal('signup');
       }
@@ -482,7 +527,7 @@
     }
 
     function switchToLoginView() {
-      document.getElementById('loginError').classList.add('hidden');
+      loginError.classList.add('hidden');
       signUpError.classList.add('hidden');
       signUpViewContainer.classList.add('hidden');
       loginViewContainer.classList.remove('hidden');
@@ -538,6 +583,8 @@
               passcode: passcode,
               current_sort: 'default',
               items: [],
+              failed_attempts: 0,
+              is_locked: false,
               updated_at: new Date()
             }
           ]);
@@ -580,10 +627,10 @@
       }
     });
 
-    // Handle Owner Login
+    // Handle Owner Login with 5-Attempt Lockout Mechanism
     document.getElementById('loginForm').addEventListener('submit', async (e) => {
       e.preventDefault();
-      document.getElementById('loginError').classList.add('hidden');
+      loginError.classList.add('hidden');
       loginSubmitBtn.disabled = true;
       loginSubmitBtn.textContent = 'Logging in...';
 
@@ -593,21 +640,34 @@
       try {
         const { data, error } = await supabaseClient
           .from('registries')
-          .select('id, user_name, user_email, venmo_handle, passcode, current_sort, items')
+          .select('id, user_name, user_email, venmo_handle, passcode, current_sort, items, failed_attempts, is_locked')
           .eq('user_email', enteredEmail);
 
         if (data && data.length > 0 && !error) {
-          const matchedUser = data.find(row => String(row.passcode).trim() === enteredPasscode);
+          const userAccount = data[0];
 
-          if (matchedUser) {
-            activeRegistryId = matchedUser.id;
+          if (userAccount.is_locked || (userAccount.failed_attempts || 0) >= 5) {
+            await supabaseClient.from('registries').update({ is_locked: true }).eq('id', userAccount.id);
+            
+            loginError.textContent = "Account locked due to 5 failed attempts. Please request passcode recovery below.";
+            loginError.classList.remove('hidden');
+            loginSubmitBtn.disabled = false;
+            loginSubmitBtn.textContent = 'Log In';
+            promptPasswordResetEmail(userAccount.user_email);
+            return;
+          }
+
+          if (String(userAccount.passcode).trim() === enteredPasscode) {
+            await supabaseClient.from('registries').update({ failed_attempts: 0, is_locked: false }).eq('id', userAccount.id);
+
+            activeRegistryId = userAccount.id;
             registryData = {
-              userName: matchedUser.user_name || "",
-              userEmail: matchedUser.user_email || "",
-              venmoHandle: matchedUser.venmo_handle || "",
-              passcode: matchedUser.passcode || "",
-              currentSort: matchedUser.current_sort || "default",
-              items: matchedUser.items || []
+              userName: userAccount.user_name || "",
+              userEmail: userAccount.user_email || "",
+              venmoHandle: userAccount.venmo_handle || "",
+              passcode: userAccount.passcode || "",
+              currentSort: userAccount.current_sort || "default",
+              items: userAccount.items || []
             };
 
             localStorage.setItem('regisTree_owner_email', enteredEmail);
@@ -624,19 +684,90 @@
             renderRegistry();
             showToast("Logged in as Owner!");
             return;
+          } else {
+            const newFailedCount = (userAccount.failed_attempts || 0) + 1;
+            const willLock = newFailedCount >= 5;
+
+            await supabaseClient.from('registries').update({
+              failed_attempts: newFailedCount,
+              is_locked: willLock
+            }).eq('id', userAccount.id);
+
+            if (willLock) {
+              loginError.textContent = "Account locked due to 5 failed attempts. Please request passcode recovery below.";
+              loginError.classList.remove('hidden');
+              promptPasswordResetEmail(userAccount.user_email);
+            } else {
+              const remaining = 5 - newFailedCount;
+              loginError.textContent = `Invalid passcode. ${remaining} attempt${remaining === 1 ? '' : 's'} remaining before account lockout.`;
+              loginError.classList.remove('hidden');
+            }
+
+            loginSubmitBtn.disabled = false;
+            loginSubmitBtn.textContent = 'Log In';
+            return;
           }
         }
 
-        document.getElementById('loginError').classList.remove('hidden');
+        loginError.textContent = "Invalid email or passcode.";
+        loginError.classList.remove('hidden');
         loginSubmitBtn.disabled = false;
         loginSubmitBtn.textContent = 'Log In';
       } catch (err) {
         console.error("Login Error:", err);
-        document.getElementById('loginError').classList.remove('hidden');
+        loginError.textContent = "Invalid email or passcode.";
+        loginError.classList.remove('hidden');
         loginSubmitBtn.disabled = false;
         loginSubmitBtn.textContent = 'Log In';
       }
     });
+
+    // Forgot Password & Lockout Recovery Handler
+    async function handleForgotPassword() {
+      const emailInput = document.getElementById('loginEmail').value.trim().toLowerCase();
+      
+      if (!emailInput) {
+        const userProvidedEmail = prompt("Please enter your account email address:");
+        if (userProvidedEmail && userProvidedEmail.trim()) {
+          promptPasswordResetEmail(userProvidedEmail.trim().toLowerCase());
+        }
+      } else {
+        promptPasswordResetEmail(emailInput);
+      }
+    }
+
+    async function promptPasswordResetEmail(targetEmail) {
+      if (confirm(`Would you like your passcode sent to ${targetEmail}?`)) {
+        try {
+          const { data, error } = await supabaseClient
+            .from('registries')
+            .select('id, user_name, passcode')
+            .eq('user_email', targetEmail);
+
+          if (data && data.length > 0 && !error) {
+            const userRecord = data[0];
+
+            await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
+              to_name: userRecord.user_name || 'User',
+              to_email: targetEmail,
+              passcode: userRecord.passcode
+            });
+            showToast(`Passcode email sent to ${targetEmail}`);
+
+            await supabaseClient.from('registries').update({
+              failed_attempts: 0,
+              is_locked: false
+            }).eq('id', userRecord.id);
+
+          } else {
+            showToast("No account found matching that email.");
+          }
+        } catch (err) {
+          console.error("Error triggering password email:", err);
+          showToast("Failed to send recovery email. Please try again.");
+        }
+      }
+    }
 
     // Navigation Controllers
     function handleHeaderTitleClick() {
@@ -871,10 +1002,6 @@
       visibleItems.forEach(item => {
         const itemCard = document.createElement('div');
         itemCard.className = `bg-white rounded-2xl p-4 sm:p-5 shadow-sm border transition-all ${item.funded ? 'border-forest-100 bg-forest-50/40' : 'border-slate-100 hover:border-slate-200'}`;
-        
-        const venmoHandle = registryData.venmoHandle || "recipient";
-        const venmoNote = encodeURIComponent(`Gift for ${item.name} via regisTree`);
-        const venmoUrl = `https://venmo.com/${venmoHandle}?txn=pay&amount=${item.price.toFixed(2)}&note=${venmoNote}`;
 
         const isOwner = currentViewMode === 'owner';
         const imageSrc = item.imageUrl || '';
@@ -920,10 +1047,10 @@
               ` : ''}
               
               ${!item.funded ? `
-                <a href="${venmoUrl}" target="_blank" onclick="markAsFunded('${item.id}')" class="w-44 text-center bg-forest-600 hover:bg-forest-700 text-white font-medium px-4 py-2.5 rounded-xl transition text-sm flex items-center justify-center gap-2 whitespace-nowrap shrink-0">
+                <button onclick="initiateVenmoFunding('${item.id}')" class="w-44 text-center bg-forest-600 hover:bg-forest-700 text-white font-medium px-4 py-2.5 rounded-xl transition text-sm flex items-center justify-center gap-2 whitespace-nowrap shrink-0">
                   <span class="whitespace-nowrap">Gift via Venmo</span>
                   <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
-                </a>
+                </button>
               ` : `
                 <div class="flex items-center justify-end gap-2 w-44 shrink-0">
                   <span class="text-xs text-forest-700 font-medium px-2 py-1 whitespace-nowrap">Purchased</span>
@@ -1027,17 +1154,52 @@
       closeEditModal();
     });
 
-    // Gift via Venmo Action
-    function markAsFunded(id) {
-      const item = registryData.items.find(i => i.id === id);
-      if (item && !item.funded) {
-        const gifterName = prompt("Enter your name so the recipient knows who gifted this item:", "Anonymous");
-        item.funded = true;
-        item.fundedBy = gifterName || "Anonymous";
-        saveState();
-        setTimeout(renderRegistry, 300);
-      }
+    // Mobile-friendly Venmo Launch System
+    function initiateVenmoFunding(itemId) {
+      activeFundingItemId = itemId;
+      document.getElementById('gifterNameInput').value = '';
+      gifterModal.classList.remove('hidden');
     }
+
+    function closeGifterModal() {
+      activeFundingItemId = null;
+      gifterModal.classList.add('hidden');
+    }
+
+    gifterForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      if (!activeFundingItemId) return;
+
+      const item = registryData.items.find(i => i.id === activeFundingItemId);
+      if (!item) return;
+
+      const gifterInput = document.getElementById('gifterNameInput').value.trim();
+      const gifterName = gifterInput || "Anonymous";
+
+      item.funded = true;
+      item.fundedBy = gifterName;
+      saveState();
+
+      const venmoHandle = registryData.venmoHandle || "recipient";
+      const noteText = `Gift for ${item.name} via regisTree`;
+      const encodedNote = encodeURIComponent(noteText);
+      const formattedAmount = item.price.toFixed(2);
+
+      const venmoWebUrl = `https://venmo.com/${venmoHandle}?txn=pay&amount=${formattedAmount}&note=${encodedNote}`;
+      const venmoAppUrl = `venmo://paycharge?txn=pay&recipients=${venmoHandle}&amount=${formattedAmount}&note=${encodedNote}`;
+
+      closeGifterModal();
+      renderRegistry();
+
+      if (isMobileDevice()) {
+        window.location.href = venmoAppUrl;
+        setTimeout(() => {
+          window.location.href = venmoWebUrl;
+        }, 1200);
+      } else {
+        window.open(venmoWebUrl, '_blank');
+      }
+    });
 
     function undoFunding(id) {
       const item = registryData.items.find(i => i.id === id);
