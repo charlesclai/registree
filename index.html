@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>regisTree | Simple Cash Proxy regisTree</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Supabase JS Client Library -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
     tailwind.config = {
@@ -32,37 +31,35 @@
 </head>
 <body class="bg-forest-50 text-slate-800 font-sans min-h-screen pb-16">
 
-  <!-- Header / Navbar -->
   <header class="bg-white border-b border-forest-100 sticky top-0 z-10">
     <div class="max-w-3xl mx-auto px-4 py-4 flex justify-between items-center">
-      <div class="flex items-center gap-2 cursor-pointer" onclick="requestOwnerAccess()">
+      <div class="flex items-center gap-2 cursor-pointer" onclick="handleHeaderTitleClick()">
         <svg class="w-7 h-7 text-forest-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v18m0-18l-4 4m4-4l4 4m-4 5l-6 6m6-6l6 6m-6 4l-8 8m8-8l8 8" />
         </svg>
         <span class="text-2xl font-bold tracking-tight text-forest-800">regis<span class="text-forest-600">Tree</span></span>
       </div>
       
-      <!-- Mode Badge & Authentication Navigation -->
       <div class="flex items-center gap-3">
         <span id="modeBadge" class="text-xs bg-forest-100 text-forest-700 px-3 py-1 rounded-full font-medium hidden">
           Owner View
         </span>
-        <button id="authNavBtn" onclick="requestOwnerAccess()" class="text-xs font-semibold text-forest-600 hover:text-forest-800 underline">
-          Owner Login
-        </button>
+        <div id="authNavContainer">
+          <button id="authNavBtn" onclick="handleAuthNavClick()" class="text-xs font-semibold text-forest-600 hover:text-forest-800 underline">
+            Owner Login
+          </button>
+        </div>
       </div>
     </div>
   </header>
 
   <main class="max-w-3xl mx-auto px-4 pt-8">
     
-    <!-- Toast Notification -->
     <div id="toast" class="fixed top-20 right-4 bg-slate-900 text-white text-xs px-4 py-3 rounded-xl shadow-lg transition-all transform translate-y-[-20px] opacity-0 pointer-events-none z-50 flex items-center gap-2">
       <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
       <span id="toastMsg">Link copied to clipboard!</span>
     </div>
 
-    <!-- regisTree Banner & Header Info -->
     <section class="bg-white rounded-2xl p-6 shadow-sm border border-forest-100 mb-8 space-y-6">
       <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-100 pb-6">
         <div>
@@ -75,7 +72,6 @@
         </div>
       </div>
 
-      <!-- OWNER ONLY: Account & Profile Management -->
       <div id="creatorProfileSection" class="space-y-4 hidden">
         <h3 class="text-sm font-bold text-slate-800 uppercase tracking-wider">Account & Profile Settings</h3>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -90,16 +86,16 @@
           </div>
 
           <div>
-            <label for="userEmailInput" class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1">Account Email Address</label>
+            <label for="userEmailInput" class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1">Account Email</label>
             <input type="email" id="userEmailInput" placeholder="you@example.com" class="w-full px-3 py-2 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-forest-600 text-sm" />
           </div>
 
           <div>
             <label for="ownerPasscodeInput" class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1">Account Passcode</label>
             <div class="relative">
-              <input type="password" id="ownerPasscodeInput" placeholder="Set passcode to lock editing" class="w-full px-3 py-2 pr-10 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-forest-600 text-sm" />
-              <button type="button" onclick="togglePasswordVisibility('ownerPasscodeInput', 'eyeIcon1')" class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600">
-                <svg id="eyeIcon1" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <input type="password" id="ownerPasscodeInput" placeholder="Update passcode" class="w-full px-3 py-2 pr-10 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-forest-600 text-sm" />
+              <button type="button" onclick="togglePasswordVisibility('ownerPasscodeInput', 'eyeIconProfile')" class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600">
+                <svg id="eyeIconProfile" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                 </svg>
@@ -119,7 +115,6 @@
       </div>
     </section>
 
-    <!-- OWNER ONLY: Add Item Section -->
     <section id="creatorAddItemSection" class="bg-white rounded-2xl p-6 shadow-sm border border-forest-100 mb-8 hidden">
       <h2 class="text-lg font-semibold text-slate-900 mb-1 flex items-center gap-2">
         <svg class="w-5 h-5 text-forest-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
@@ -137,7 +132,6 @@
       </form>
     </section>
 
-    <!-- Wishlist Container (Visible to Both Views) -->
     <section>
       <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
         <div>
@@ -145,7 +139,6 @@
           <span class="text-xs text-slate-400">Clicking "Gift via Venmo" opens Venmo pre-filled</span>
         </div>
 
-        <!-- Sorting Control -->
         <div class="flex items-center gap-2">
           <label for="sortSelect" class="text-xs font-medium text-slate-500 whitespace-nowrap">Sort by:</label>
           <select id="sortSelect" onchange="changeSort(this.value)" class="bg-white border border-slate-200 text-xs font-medium text-slate-700 px-3 py-1.5 rounded-lg focus:outline-none focus:ring-2 focus:ring-forest-600">
@@ -158,58 +151,109 @@
       </div>
       
       <div id="itemList" class="space-y-4">
-        <!-- Dynamic items render here -->
-      </div>
+        </div>
     </section>
 
   </main>
 
-  <!-- Owner Authentication / Registration Modal -->
   <div id="authModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm hidden flex items-center justify-center z-50 p-4">
-    <div class="bg-white rounded-2xl max-w-sm w-full p-6 shadow-xl border border-slate-100 space-y-4 text-center">
+    <div class="bg-white rounded-2xl max-w-sm w-full p-6 shadow-xl border border-slate-100 space-y-4">
       <div class="w-12 h-12 bg-forest-100 rounded-full flex items-center justify-center mx-auto text-forest-700">
         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
       </div>
-      <div>
-        <h3 class="text-lg font-semibold text-slate-900" id="authModalTitle">Owner Account Access</h3>
-        <p class="text-xs text-slate-500 mt-1" id="authModalSubtext">Log in with your account email and passcode to edit this regisTree.</p>
+
+      <div id="loginViewContainer">
+        <div class="text-center mb-4">
+          <h3 class="text-lg font-semibold text-slate-900">Owner Login</h3>
+          <p class="text-xs text-slate-500 mt-1">Enter your email and passcode to access Owner View.</p>
+        </div>
+
+        <form id="loginForm" class="space-y-3">
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1">Email Address</label>
+            <input type="email" id="loginEmail" required placeholder="you@example.com" class="w-full px-3 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-forest-600 text-sm" />
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1">Passcode</label>
+            <div class="relative">
+              <input type="password" id="loginPasscode" required placeholder="Enter passcode" class="w-full px-3 py-2 pr-10 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-forest-600 text-sm" />
+              <button type="button" onclick="togglePasswordVisibility('loginPasscode', 'eyeIconLogin')" class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600">
+                <svg id="eyeIconLogin" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <p id="loginError" class="text-xs text-red-600 hidden font-medium text-center">Invalid email or passcode.</p>
+
+          <div class="flex gap-2 pt-2">
+            <button type="button" onclick="closeAuthModal()" class="w-full py-2.5 rounded-xl text-sm font-medium text-slate-600 hover:bg-slate-100 transition">Cancel</button>
+            <button type="submit" class="w-full py-2.5 rounded-xl text-sm font-medium bg-forest-600 hover:bg-forest-700 text-white transition">Log In</button>
+          </div>
+        </form>
+
+        <div class="text-center pt-4 border-t border-slate-100 mt-4">
+          <p class="text-xs text-slate-500">Don't have an owner account yet?</p>
+          <button onclick="switchToSignUpView()" class="text-xs font-bold text-forest-600 hover:underline mt-1">Create an Account</button>
+        </div>
       </div>
 
-      <form id="authForm" class="space-y-3 text-left">
-        <div>
-          <label class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1">Account Email</label>
-          <input type="email" id="inputAuthEmail" required placeholder="you@example.com" class="w-full px-3 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-forest-600 text-sm" />
+      <div id="signUpViewContainer" class="hidden">
+        <div class="text-center mb-4">
+          <h3 class="text-lg font-semibold text-slate-900">Create Owner Account</h3>
+          <p class="text-xs text-slate-500 mt-1">Register an email and passcode to own this regisTree.</p>
         </div>
 
-        <div>
-          <label class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1">Passcode</label>
-          <div class="relative">
-            <input type="password" id="inputAuthPasscode" required placeholder="Enter passcode" class="w-full px-3 py-2 pr-10 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-forest-600 text-sm" />
-            <button type="button" onclick="togglePasswordVisibility('inputAuthPasscode', 'eyeIcon2')" class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600">
-              <svg id="eyeIcon2" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-              </svg>
-            </button>
+        <form id="signUpForm" class="space-y-3">
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1">Your Name</label>
+            <input type="text" id="signUpName" required placeholder="e.g. Charles" class="w-full px-3 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-forest-600 text-sm" />
           </div>
-        </div>
 
-        <p id="authError" class="text-xs text-red-600 hidden font-medium text-center">Invalid email address or passcode.</p>
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1">Venmo Handle</label>
+            <input type="text" id="signUpVenmo" required placeholder="e.g. Charles-Smith" class="w-full px-3 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-forest-600 text-sm" />
+          </div>
 
-        <div class="flex gap-2 pt-2">
-          <button type="button" onclick="closeAuthModal()" class="w-full py-2.5 rounded-xl text-sm font-medium text-slate-600 hover:bg-slate-100 transition">Cancel</button>
-          <button type="submit" class="w-full py-2.5 rounded-xl text-sm font-medium bg-forest-600 hover:bg-forest-700 text-white transition">Submit</button>
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1">Email Address</label>
+            <input type="email" id="signUpEmail" required placeholder="you@example.com" class="w-full px-3 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-forest-600 text-sm" />
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1">Set Passcode</label>
+            <div class="relative">
+              <input type="password" id="signUpPasscode" required placeholder="Create passcode" class="w-full px-3 py-2 pr-10 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-forest-600 text-sm" />
+              <button type="button" onclick="togglePasswordVisibility('signUpPasscode', 'eyeIconSignUp')" class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600">
+                <svg id="eyeIconSignUp" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <div class="flex gap-2 pt-2">
+            <button type="button" onclick="closeAuthModal()" class="w-full py-2.5 rounded-xl text-sm font-medium text-slate-600 hover:bg-slate-100 transition">Cancel</button>
+            <button type="submit" class="w-full py-2.5 rounded-xl text-sm font-medium bg-forest-600 hover:bg-forest-700 text-white transition">Create Account</button>
+          </div>
+        </form>
+
+        <div class="text-center pt-4 border-t border-slate-100 mt-4">
+          <p class="text-xs text-slate-500">Already registered?</p>
+          <button onclick="switchToLoginView()" class="text-xs font-bold text-forest-600 hover:underline mt-1">Log in here</button>
         </div>
-      </form>
+      </div>
     </div>
   </div>
 
-  <!-- Item Edit & Image Preview Modal (OWNER ONLY) -->
   <div id="editModal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm hidden flex items-center justify-center z-50 p-4">
     <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-xl border border-slate-100 space-y-4">
       <h3 class="text-lg font-semibold text-slate-900" id="editModalHeader">Configure regisTree Item</h3>
       
-      <!-- Live Thumbnail Preview Box -->
       <div class="bg-slate-50 border border-slate-200 rounded-xl p-3 flex items-center gap-4">
         <div class="w-20 h-20 bg-white border border-slate-200 rounded-lg overflow-hidden flex-shrink-0 flex items-center justify-center">
           <img id="modalPreviewImg" src="" alt="Thumbnail preview" class="w-full h-full object-cover hidden" onerror="handleImgError(this)" />
@@ -256,13 +300,13 @@
     </div>
   </div>
 
-  <!-- Application Logic JavaScript -->
   <script>
     // Supabase Credentials
     const SUPABASE_URL = 'https://kzifhsejyezhkmpeyexh.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt6aWZoc2VqeWV6aGttcGV5ZXhoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgwOTIxMjIsImV4cCI6MjEwMzY2ODEyMn0.CDBZE-3ZTO-wBeewYmPsAzmDyRD65vXTTV6g30CNGn0';
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+    // Get or Create Persistent Unique Registry ID
     function getRegistryId() {
       const params = new URLSearchParams(window.location.search);
       let id = params.get('id');
@@ -272,6 +316,7 @@
           id = 'registree-' + Math.random().toString(36).substring(2, 9);
           localStorage.setItem('regisTree_active_id', id);
         }
+        window.history.replaceState(null, '', `?id=${id}`);
       }
       return id;
     }
@@ -305,10 +350,11 @@
     const modalPreviewPlaceholder = document.getElementById('modalPreviewPlaceholder');
 
     const authModal = document.getElementById('authModal');
-    const authForm = document.getElementById('authForm');
+    const loginViewContainer = document.getElementById('loginViewContainer');
+    const signUpViewContainer = document.getElementById('signUpViewContainer');
     
     const modeBadge = document.getElementById('modeBadge');
-    const authNavBtn = document.getElementById('authNavBtn');
+    const authNavContainer = document.getElementById('authNavContainer');
     const creatorProfileSection = document.getElementById('creatorProfileSection');
     const creatorAddItemSection = document.getElementById('creatorAddItemSection');
 
@@ -331,7 +377,7 @@
       return trimmed;
     }
 
-    // Eye Password Visibility Toggle
+    // Toggle Eye Passcode Visibility
     function togglePasswordVisibility(inputId, iconId) {
       const input = document.getElementById(inputId);
       const icon = document.getElementById(iconId);
@@ -368,11 +414,7 @@
         console.error("Error loading state from Supabase:", err);
       }
       
-      // Mandatory Security: Always default to buyer mode if account email/passcode is set
-      if (registryData.userEmail && registryData.passcode && !isUnlocked) {
-        currentViewMode = 'buyer';
-      }
-      
+      currentViewMode = 'buyer';
       applyViewModeUI();
       renderRegistry();
     }
@@ -394,17 +436,28 @@
       }
     }
 
-    // Explicit Owner Account Authentication Controller
-    function requestOwnerAccess() {
+    // Header Actions & Auth Routing
+    function handleHeaderTitleClick() {
+      currentViewMode = 'buyer';
+      window.history.replaceState(null, '', `?id=${currentRegistryId}&view=buyer`);
+      applyViewModeUI();
+      renderRegistry();
+    }
+
+    function handleAuthNavClick() {
       if (currentViewMode === 'owner') {
         currentViewMode = 'buyer';
         window.history.replaceState(null, '', `?id=${currentRegistryId}&view=buyer`);
         applyViewModeUI();
         renderRegistry();
       } else {
-        // Require Email + Passcode login
         if (!isUnlocked) {
-          openAuthModal();
+          if (!registryData.passcode || !registryData.userEmail) {
+            switchToSignUpView();
+          } else {
+            switchToLoginView();
+          }
+          authModal.classList.remove('hidden');
         } else {
           currentViewMode = 'owner';
           window.history.replaceState(null, '', `?id=${currentRegistryId}`);
@@ -414,48 +467,37 @@
       }
     }
 
-    function openAuthModal() {
-      document.getElementById('inputAuthEmail').value = registryData.userEmail || '';
-      document.getElementById('inputAuthPasscode').value = '';
-      document.getElementById('authError').classList.add('hidden');
+    function logoutOwner() {
+      isUnlocked = false;
+      currentViewMode = 'buyer';
+      window.history.replaceState(null, '', `?id=${currentRegistryId}&view=buyer`);
+      applyViewModeUI();
+      renderRegistry();
+      showToast("Logged out successfully.");
+    }
 
-      if (!registryData.userEmail || !registryData.passcode) {
-        document.getElementById('authModalTitle').textContent = "Create Owner Account";
-        document.getElementById('authModalSubtext').textContent = "Set your account email address and passcode to register ownership of this regisTree.";
-      } else {
-        document.getElementById('authModalTitle').textContent = "Owner Account Access";
-        document.getElementById('authModalSubtext').textContent = "Log in with your registered account email and passcode.";
-      }
+    function switchToLoginView() {
+      document.getElementById('loginError').classList.add('hidden');
+      signUpViewContainer.classList.add('hidden');
+      loginViewContainer.classList.remove('hidden');
+    }
 
-      authModal.classList.remove('hidden');
+    function switchToSignUpView() {
+      loginViewContainer.classList.add('hidden');
+      signUpViewContainer.classList.remove('hidden');
     }
 
     function closeAuthModal() {
       authModal.classList.add('hidden');
     }
 
-    authForm.addEventListener('submit', (e) => {
+    // Handle Login Form Submission
+    document.getElementById('loginForm').addEventListener('submit', (e) => {
       e.preventDefault();
-      const enteredEmail = document.getElementById('inputAuthEmail').value.trim().toLowerCase();
-      const enteredPasscode = document.getElementById('inputAuthPasscode').value.trim();
+      const enteredEmail = document.getElementById('loginEmail').value.trim().toLowerCase();
+      const enteredPasscode = document.getElementById('loginPasscode').value.trim();
 
-      // Unset regisTree Registration Step
-      if (!registryData.userEmail || !registryData.passcode) {
-        registryData.userEmail = enteredEmail;
-        registryData.passcode = enteredPasscode;
-        isUnlocked = true;
-        saveState();
-        closeAuthModal();
-        currentViewMode = 'owner';
-        window.history.replaceState(null, '', `?id=${currentRegistryId}`);
-        applyViewModeUI();
-        renderRegistry();
-        showToast("Account created & Owner View unlocked!");
-        return;
-      }
-
-      // Existing Account Authentication Step
-      if (enteredEmail === registryData.userEmail.toLowerCase() && enteredPasscode === registryData.passcode) {
+      if (enteredEmail === (registryData.userEmail || '').toLowerCase() && enteredPasscode === registryData.passcode) {
         isUnlocked = true;
         closeAuthModal();
         currentViewMode = 'owner';
@@ -464,15 +506,43 @@
         renderRegistry();
         showToast("Logged in as Owner!");
       } else {
-        document.getElementById('authError').classList.remove('hidden');
+        document.getElementById('loginError').classList.remove('hidden');
       }
+    });
+
+    // Handle Sign Up Form Submission
+    document.getElementById('signUpForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const name = document.getElementById('signUpName').value.trim();
+      const venmo = document.getElementById('signUpVenmo').value.trim().replace(/^@/, '');
+      const email = document.getElementById('signUpEmail').value.trim().toLowerCase();
+      const passcode = document.getElementById('signUpPasscode').value.trim();
+
+      registryData.userName = name;
+      registryData.venmoHandle = venmo;
+      registryData.userEmail = email;
+      registryData.passcode = passcode;
+      
+      isUnlocked = true;
+      saveState();
+      closeAuthModal();
+      
+      currentViewMode = 'owner';
+      window.history.replaceState(null, '', `?id=${currentRegistryId}`);
+      applyViewModeUI();
+      renderRegistry();
+      showToast("Owner account created & regisTree saved!");
     });
 
     function applyViewModeUI() {
       if (currentViewMode === 'buyer') {
         modeBadge.classList.add('hidden');
-        authNavBtn.textContent = 'Owner Login';
         
+        authNavContainer.innerHTML = `
+          <button onclick="handleAuthNavClick()" class="text-xs font-semibold text-forest-600 hover:text-forest-800 underline">
+            ${isUnlocked ? 'Owner View' : 'Owner Login'}
+          </button>`;
+
         creatorProfileSection.classList.add('hidden');
         creatorAddItemSection.classList.add('hidden');
 
@@ -482,7 +552,16 @@
         modeBadge.className = 'text-xs bg-forest-100 text-forest-700 px-3 py-1 rounded-full font-medium';
         modeBadge.classList.remove('hidden');
 
-        authNavBtn.textContent = 'Show regisTree';
+        authNavContainer.innerHTML = `
+          <div class="flex items-center gap-2">
+            <button onclick="handleAuthNavClick()" class="text-xs font-semibold text-forest-600 hover:text-forest-800 underline">
+              Show regisTree
+            </button>
+            <span class="text-slate-300">|</span>
+            <button onclick="logoutOwner()" class="text-xs text-slate-400 hover:text-red-600 underline">
+              Log Out
+            </button>
+          </div>`;
 
         creatorProfileSection.classList.remove('hidden');
         creatorAddItemSection.classList.remove('hidden');
@@ -508,7 +587,7 @@
       showToast("Account profile settings saved!");
     }
 
-    // Share regisTree Link Action
+    // Share regisTree Link Action (Strictly targeting current ID)
     function shareRegistry() {
       const shareUrl = `${window.location.origin}${window.location.pathname}?id=${currentRegistryId}&view=buyer`;
       navigator.clipboard.writeText(shareUrl).then(() => {
@@ -675,7 +754,6 @@
         itemCard.innerHTML = `
           <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div class="flex items-center gap-4">
-              <!-- Thumbnail Image Container -->
               <div class="w-16 h-16 sm:w-20 sm:h-20 bg-slate-50 border border-slate-100 rounded-xl overflow-hidden flex-shrink-0 flex items-center justify-center">
                 ${imageSrc ? `
                   <img src="${escapeHtml(imageSrc)}" alt="${escapeHtml(item.name)}" class="w-full h-full object-cover" onerror="handleImgError(this)" />
@@ -720,140 +798,4 @@
                 </a>
               ` : `
                 <div class="flex items-center justify-end gap-2 w-44 shrink-0">
-                  <span class="text-xs text-forest-700 font-medium px-2 py-1 whitespace-nowrap">Purchased</span>
-                  <button onclick="undoFunding('${item.id}')" class="text-xs text-slate-400 hover:text-red-600 underline px-2 py-1 transition whitespace-nowrap">
-                    Undo
-                  </button>
-                </div>
-              `}
-            </div>
-          </div>
-        `;
-        itemListEl.appendChild(itemCard);
-      });
-    }
-
-    // Add Item Form Handler (Async with Image Scraping & Immediate Modal Preview)
-    addItemForm.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const urlInput = document.getElementById('itemUrl');
-      const rawUrl = urlInput.value.trim();
-      const normalizedUrl = normalizeUrl(rawUrl);
-
-      submitBtn.disabled = true;
-      submitBtn.innerHTML = `<span>Fetching info...</span>`;
-
-      const metadata = await extractMetadataFromUrl(normalizedUrl);
-
-      const newItem = {
-        id: Date.now().toString(),
-        name: metadata.name,
-        price: metadata.price,
-        imageUrl: metadata.imageUrl || '',
-        url: normalizedUrl,
-        funded: false,
-        fundedBy: null
-      };
-
-      registryData.items.unshift(newItem);
-      saveState();
-      renderRegistry();
-      
-      urlInput.value = '';
-      submitBtn.disabled = false;
-      submitBtn.innerHTML = `<span>Plant Item</span>`;
-      
-      openEditModal(newItem.id);
-    });
-
-    // Delete Item Actions
-    function deleteRegistryItem(id) {
-      if (currentViewMode !== 'owner') return;
-
-      const item = registryData.items.find(i => i.id === id);
-      if (item && confirm(`Are you sure you want to delete "${item.name}" from your regisTree?`)) {
-        registryData.items = registryData.items.filter(i => i.id !== id);
-        saveState();
-        renderRegistry();
-      }
-    }
-
-    function deleteModalItem() {
-      const id = document.getElementById('editItemId').value;
-      closeEditModal();
-      deleteRegistryItem(id);
-    }
-
-    // Edit & Preview Modal Logic
-    function openEditModal(id) {
-      if (currentViewMode !== 'owner') return;
-
-      const item = registryData.items.find(i => i.id === id);
-      if (!item) return;
-
-      document.getElementById('editItemId').value = item.id;
-      document.getElementById('editItemName').value = item.name;
-      document.getElementById('editItemPrice').value = item.price;
-      document.getElementById('editItemImageUrl').value = item.imageUrl || '';
-      document.getElementById('editItemUrl').value = item.url;
-      
-      updateModalPreview(item.imageUrl);
-      editModal.classList.remove('hidden');
-    }
-
-    function closeEditModal() {
-      editModal.classList.add('hidden');
-    }
-
-    editItemForm.addEventListener('submit', (e) => {
-      e.preventDefault();
-      const id = document.getElementById('editItemId').value;
-      const item = registryData.items.find(i => i.id === id);
-
-      if (item) {
-        item.name = document.getElementById('editItemName').value.trim();
-        item.price = parseFloat(document.getElementById('editItemPrice').value) || 0;
-        item.imageUrl = document.getElementById('editItemImageUrl').value.trim();
-        item.url = normalizeUrl(document.getElementById('editItemUrl').value);
-        saveState();
-        renderRegistry();
-      }
-
-      closeEditModal();
-    });
-
-    // Mark Item as Funded
-    function markAsFunded(id) {
-      const item = registryData.items.find(i => i.id === id);
-      if (item && !item.funded) {
-        const gifterName = prompt("Enter your name so the recipient knows who gifted this item:", "Anonymous");
-        item.funded = true;
-        item.fundedBy = gifterName || "Anonymous";
-        saveState();
-        setTimeout(renderRegistry, 300);
-      }
-    }
-
-    // Undo Funding Status
-    function undoFunding(id) {
-      const item = registryData.items.find(i => i.id === id);
-      if (item && item.funded) {
-        item.funded = false;
-        item.fundedBy = null;
-        saveState();
-        renderRegistry();
-      }
-    }
-
-    // Helper: Escape Special Characters
-    function escapeHtml(str) {
-      return str.replace(/[&<>"']/g, function(m) {
-        return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[m];
-      });
-    }
-
-    // Initial Execution
-    loadState();
-  </script>
-</body>
-</html>
+                  <span class="
