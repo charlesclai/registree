@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>regisTree | Simple Cash Proxy Registry</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            forest: {
+              50: '#f2f7f4',
+              100: '#e1ede6',
+              600: '#2d5a43',
+              700: '#1e3d2d',
+              800: '#14291e',
+            },
+            wood: {
+              100: '#f7f4f0',
+              500: '#a38560',
+              800: '#4a3b2c',
+            }
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-forest-50 text-slate-800 font-sans min-h-screen pb-16">
+
+  <!-- Header / Navbar -->
+  <header class="bg-white border-b border-forest-100 sticky top-0 z-10">
+    <div class="max-w-3xl mx-auto px-4 py-4 flex justify-between items-center">
+      <div class="flex items-center gap-2">
+        <svg class="w-7 h-7 text-forest-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v18m0-18l-4 4m4-4l4 4m-4 5l-6 6m6-6l6 6m-6 4l-8 8m8-8l8 8" />
+        </svg>
+        <span class="text-2xl font-bold tracking-tight text-forest-800">regis<span class="text-forest-600">Tree</span></span>
+      </div>
+      <span class="text-xs bg-forest-100 text-forest-700 px-3 py-1 rounded-full font-medium">Branching Out Gifting</span>
+    </div>
+  </header>
+
+  <main class="max-w-3xl mx-auto px-4 pt-8">
+    
+    <!-- Registry Banner & Setup Info -->
+    <section class="bg-white rounded-2xl p-6 shadow-sm border border-forest-100 mb-8 space-y-6">
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-100 pb-6">
+        <div>
+          <h1 class="text-2xl font-bold text-slate-900" id="registryTitle">My regisTree</h1>
+          <p class="text-slate-500 text-sm mt-1">Directly fund items to cut out shipping delays and packaging waste.</p>
+        </div>
+        <div class="bg-wood-100 p-3.5 rounded-xl border border-wood-500/20 text-xs text-wood-800">
+          <span class="font-semibold block text-slate-700 mb-0.5">Recipient Venmo:</span>
+          <span id="venmoDisplay" class="font-mono text-forest-600 font-semibold text-sm">Not set</span>
+        </div>
+      </div>
+
+      <!-- Recipient Profile Inputs -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label for="userNameInput" class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1">Your Name</label>
+          <div class="flex gap-2">
+            <input type="text" id="userNameInput" placeholder="e.g. Charles" class="w-full px-3 py-2 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-forest-600 text-sm" />
+            <button type="button" onclick="updateUserName()" class="bg-slate-800 hover:bg-slate-900 text-white text-xs font-medium px-4 py-2 rounded-lg transition">Save</button>
+          </div>
+        </div>
+
+        <div>
+          <label for="venmoHandleInput" class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1">Your Venmo Handle</label>
+          <div class="flex gap-2">
+            <input type="text" id="venmoHandleInput" placeholder="e.g. Charles-Smith" class="w-full px-3 py-2 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-forest-600 text-sm" />
+            <button type="button" onclick="updateVenmoHandle()" class="bg-slate-800 hover:bg-slate-900 text-white text-xs font-medium px-4 py-2 rounded-lg transition">Save</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Add Item Section (Recipient View) -->
+    <section class="bg-white rounded-2xl p-6 shadow-sm border border-forest-100 mb-8">
+      <h2 class="text-lg font-semibold text-slate-900 mb-1 flex items-center gap-2">
+        <svg class="w-5 h-5 text-forest-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+        Add an Item via URL
+      </h2>
+      <p class="text-slate-500 text-xs mb-4">Paste any link from an online merchant. We'll do our best to automatically extract the details.</p>
+      
+      <form id="addItemForm" class="space-y-3">
+        <div class="flex flex-col sm:flex-row gap-2">
+          <input type="text" id="itemUrl" required class="flex-grow px-4 py-2.5 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-forest-600 text-sm" />
+          <button type="submit" id="submitBtn" class="bg-forest-600 hover:bg-forest-700 text-white font-medium px-6 py-2.5 rounded-lg transition text-sm flex items-center justify-center gap-2 whitespace-nowrap">
+            <span>Plant Item</span>
+          </button>
+        </div>
+      </form>
+    </section>
+
+    <!-- Wishlist Container -->
+    <section>
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+        <div>
+          <h2 class="text-lg font-semibold text-slate-900">Registry Items</h2>
+          <span class="text-xs text-slate-400">Clicking "Gift via Venmo" opens Venmo pre-filled</span>
+        </div>
+
+        <!-- Sorting Control -->
+        <div class="flex items-center gap-2">
+          <label for="sortSelect" class="text-xs font-medium text-slate-500 whitespace-nowrap">Sort by:</label>
+          <select id="sortSelect" onchange="changeSort(this.value)" class="bg-white border border-slate-200 text-xs font-medium text-slate-700 px-3 py-1.5 rounded-lg focus:outline-none focus:ring-2 focus:ring-forest-600">
+            <option value="default">Recently Added</option>
+            <option value="price-desc">Price: High to Low</option>
+            <option value="price-asc">Price: Low to High</option>
+            <option value="alpha">Alphabetical (A–Z)</option>
+          </select>
+        </div>
+      </div>
+      
+      <div id="itemList" class="space-y-4">
+        <!-- Dynamic items render here -->
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Edit Item Modal -->
+  <div id="editModal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm hidden flex items-center justify-center z-50 p-4">
+    <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-xl border border-slate-100 space-y-4">
+      <h3 class="text-lg font-semibold text-slate-900">Edit Registry Item</h3>
+      <form id="editItemForm" class="space-y-3">
+        <input type="hidden" id="editItemId" />
+        <div>
+          <label class="text-xs font-semibold text-slate-500 uppercase tracking-wider block mb-1">Item Title</label>
+          <input type="text" id="editItemName" required class="w-full px-3 py-2 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-forest-600 text-sm" />
+        </div>
+        <div>
+          <label class="text-xs font-semibold text-slate-500 uppercase tracking-wider block mb-1">Price ($)</label>
+          <input type="number" step="0.01" id="editItemPrice" required class="w-full px-3 py-2 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-forest-600 text-sm" />
+        </div>
+        <div>
+          <label class="text-xs font-semibold text-slate-500 uppercase tracking-wider block mb-1">Product URL</label>
+          <input type="text" id="editItemUrl" required class="w-full px-3 py-2 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-forest-600 text-sm" />
+        </div>
+        <div class="flex justify-end gap-2 pt-2">
+          <button type="button" onclick="closeEditModal()" class="px-4 py-2 rounded-lg text-sm font-medium text-slate-600 hover:bg-slate-100 transition">Cancel</button>
+          <button type="submit" class="px-4 py-2 rounded-lg text-sm font-medium bg-forest-600 hover:bg-forest-700 text-white transition">Save Changes</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Application Logic JavaScript -->
+  <script>
+    // Registry Data State
+    let registryData = {
+      userName: "",
+      venmoHandle: "",
+      currentSort: "default",
+      items: []
+    };
+
+    // DOM Elements
+    const itemListEl = document.getElementById('itemList');
+    const addItemForm = document.getElementById('addItemForm');
+    const venmoDisplay = document.getElementById('venmoDisplay');
+    const registryTitle = document.getElementById('registryTitle');
+    const submitBtn = document.getElementById('submitBtn');
+    const editModal = document.getElementById('editModal');
+    const editItemForm = document.getElementById('editItemForm');
+
+    // Number Formatter (with commas, no USD label)
+    const currencyFormatter = new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+    });
+
+    function formatPrice(amount) {
+      return currencyFormatter.format(amount);
+    }
+
+    // Ensures URL has an HTTP/HTTPS protocol for clickable anchor links
+    function normalizeUrl(urlString) {
+      const trimmed = urlString.trim();
+      if (!/^https?:\/\//i.test(trimmed)) {
+        return `https://${trimmed}`;
+      }
+      return trimmed;
+    }
+
+    // Update Recipient Name
+    function updateUserName() {
+      const input = document.getElementById('userNameInput').value.trim();
+      if (!input) return;
+      
+      registryData.userName = input;
+      const ending = input.endsWith('s') || input.endsWith('S') ? "'s" : "'s";
+      registryTitle.textContent = `${registryData.userName}${ending} regisTree`;
+    }
+
+    // Update Venmo Handle
+    function updateVenmoHandle() {
+      const input = document.getElementById('venmoHandleInput').value.trim().replace(/^@/, '');
+      if (!input) return;
+
+      registryData.venmoHandle = input;
+      venmoDisplay.textContent = `@${registryData.venmoHandle}`;
+      renderRegistry();
+    }
+
+    // Change Sorting Option
+    function changeSort(sortOption) {
+      registryData.currentSort = sortOption;
+      renderRegistry();
+    }
+
+    // Get Sorted Items Array
+    function getSortedItems() {
+      let itemsCopy = [...registryData.items];
+      switch (registryData.currentSort) {
+        case 'price-desc':
+          return itemsCopy.sort((a, b) => b.price - a.price);
+        case 'price-asc':
+          return itemsCopy.sort((a, b) => a.price - b.price);
+        case 'alpha':
+          return itemsCopy.sort((a, b) => a.name.localeCompare(b.name));
+        case 'default':
+        default:
+          return itemsCopy;
+      }
+    }
+
+    // Flexible URL Metadata Extractor
+    function extractMetadataFromUrl(urlString) {
+      try {
+        const normalized = normalizeUrl(urlString);
+        const url = new URL(normalized);
+        let domain = url.hostname.replace('www.', '').split('.')[0];
+        domain = domain.charAt(0).toUpperCase() + domain.slice(1);
+
+        const pathSegments = url.pathname.split('/').filter(Boolean);
+        let rawSlug = pathSegments.find(s => s.includes('-') || s.includes('_')) || pathSegments[pathSegments.length - 1] || domain;
+        
+        let cleanName = rawSlug
+          .replace(/[-_]/g, ' ')
+          .replace(/\b(product|shop|dp|p|buy|item|id)\b/gi, '')
+          .replace(/\d+/g, '')
+          .trim();
+
+        if (!cleanName || cleanName.length < 3) {
+          cleanName = `${domain} Item`;
+        } else {
+          cleanName = cleanName.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+        }
+
+        return {
+          name: cleanName,
+          price: 0.00
+        };
+      } catch (e) {
+        return {
+          name: "Registry Item",
+          price: 0.00
+        };
+      }
+    }
+
+    // Render Registry Items
+    function renderRegistry() {
+      itemListEl.innerHTML = '';
+      venmoDisplay.textContent = registryData.venmoHandle ? `@${registryData.venmoHandle}` : 'Not set';
+
+      const visibleItems = getSortedItems();
+
+      if (visibleItems.length === 0) {
+        itemListEl.innerHTML = `
+          <div class="bg-white p-12 rounded-2xl text-center text-slate-400 border border-slate-100">
+            <svg class="w-12 h-12 mx-auto text-slate-300 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"/></svg>
+            <p class="font-medium text-slate-600">Your registry is currently empty</p>
+            <p class="text-xs text-slate-400 mt-1">Paste a product URL above to add your first item.</p>
+          </div>`;
+        return;
+      }
+
+      visibleItems.forEach(item => {
+        const itemCard = document.createElement('div');
+        itemCard.className = `bg-white rounded-2xl p-5 shadow-sm border transition-all ${item.funded ? 'border-forest-100 bg-forest-50/40' : 'border-slate-100 hover:border-slate-200'}`;
+        
+        const venmoHandle = registryData.venmoHandle || "recipient";
+        const venmoNote = encodeURIComponent(`Gift for ${item.name} via regisTree`);
+        const venmoUrl = `https://venmo.com/${venmoHandle}?txn=pay&amount=${item.price.toFixed(2)}&note=${venmoNote}`;
+
+        itemCard.innerHTML = `
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div class="space-y-1">
+              <div class="flex items-center gap-2">
+                <span class="font-semibold text-slate-800 text-base">${escapeHtml(item.name)}</span>
+                ${item.funded ? `<span class="bg-forest-100 text-forest-700 text-xs px-2.5 py-0.5 rounded-full font-medium whitespace-nowrap">Funded</span>` : ''}
+              </div>
+              <div class="flex items-center gap-4 text-xs">
+                <span class="text-slate-900 font-bold text-sm">${formatPrice(item.price)}</span>
+                <a href="${escapeHtml(item.url)}" target="_blank" rel="noopener noreferrer" class="text-forest-600 hover:underline flex items-center gap-1 font-medium">
+                  View on Retailer Site
+                  <svg class="w-3 h-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                </a>
+              </div>
+              ${item.fundedBy ? `<p class="text-xs text-slate-400 pt-1">Funded by <span class="text-slate-600 font-medium">${escapeHtml(item.fundedBy)}</span></p>` : ''}
+            </div>
+
+            <div class="flex items-center gap-2 flex-shrink-0">
+              <button onclick="openEditModal('${item.id}')" class="p-2 text-slate-400 hover:text-slate-600 rounded-lg hover:bg-slate-100 transition flex-shrink-0" title="Edit item details">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+              </button>
+              
+              ${!item.funded ? `
+                <a href="${venmoUrl}" target="_blank" onclick="markAsFunded('${item.id}')" class="w-44 text-center bg-forest-600 hover:bg-forest-700 text-white font-medium px-4 py-2.5 rounded-xl transition text-sm flex items-center justify-center gap-2 whitespace-nowrap shrink-0">
+                  <span class="whitespace-nowrap">Gift via Venmo</span>
+                  <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                </a>
+              ` : `
+                <div class="flex items-center justify-end gap-2 w-44 shrink-0">
+                  <span class="text-xs text-forest-700 font-medium px-2 py-1 whitespace-nowrap">Purchased</span>
+                  <button onclick="undoFunding('${item.id}')" class="text-xs text-slate-400 hover:text-red-600 underline px-2 py-1 transition whitespace-nowrap">
+                    Undo
+                  </button>
+                </div>
+              `}
+            </div>
+          </div>
+        `;
+        itemListEl.appendChild(itemCard);
+      });
+    }
+
+    // Add Item Form Handler
+    addItemForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const urlInput = document.getElementById('itemUrl');
+      const rawUrl = urlInput.value.trim();
+      const normalizedUrl = normalizeUrl(rawUrl);
+
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = `<span>Fetching info...</span>`;
+
+      setTimeout(() => {
+        const metadata = extractMetadataFromUrl(normalizedUrl);
+
+        const newItem = {
+          id: Date.now().toString(),
+          name: metadata.name,
+          price: metadata.price,
+          url: normalizedUrl,
+          funded: false,
+          fundedBy: null
+        };
+
+        registryData.items.unshift(newItem);
+        renderRegistry();
+        
+        urlInput.value = '';
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = `<span>Plant Item</span>`;
+        
+        openEditModal(newItem.id);
+      }, 300);
+    });
+
+    // Edit Modal Logic
+    function openEditModal(id) {
+      const item = registryData.items.find(i => i.id === id);
+      if (!item) return;
+
+      document.getElementById('editItemId').value = item.id;
+      document.getElementById('editItemName').value = item.name;
+      document.getElementById('editItemPrice').value = item.price;
+      document.getElementById('editItemUrl').value = item.url;
+      
+      editModal.classList.remove('hidden');
+    }
+
+    function closeEditModal() {
+      editModal.classList.add('hidden');
+    }
+
+    editItemForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const id = document.getElementById('editItemId').value;
+      const item = registryData.items.find(i => i.id === id);
+
+      if (item) {
+        item.name = document.getElementById('editItemName').value.trim();
+        item.price = parseFloat(document.getElementById('editItemPrice').value) || 0;
+        item.url = normalizeUrl(document.getElementById('editItemUrl').value);
+        renderRegistry();
+      }
+
+      closeEditModal();
+    });
+
+    // Mark Item as Funded
+    function markAsFunded(id) {
+      const item = registryData.items.find(i => i.id === id);
+      if (item && !item.funded) {
+        const gifterName = prompt("Enter your name to mark this item as gifted:", "A Friend");
+        item.funded = true;
+        item.fundedBy = gifterName || "Anonymous";
+        setTimeout(renderRegistry, 300);
+      }
+    }
+
+    // Undo Funding Status
+    function undoFunding(id) {
+      const item = registryData.items.find(i => i.id === id);
+      if (item && item.funded) {
+        item.funded = false;
+        item.fundedBy = null;
+        renderRegistry();
+      }
+    }
+
+    // Helper to Escape Special Characters
+    function escapeHtml(str) {
+      return str.replace(/[&<>"']/g, function(m) {
+        return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[m];
+      });
+    }
+
+    // Initial Render
+    renderRegistry();
+  </script>
+</body>
+</html>
