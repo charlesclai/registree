@@ -3,8 +3,9 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>regisTree | Simple Cash Proxy regisTree</title>
+  <title>regisTree | Simple Cash Proxy Registry</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Supabase JS Client Library -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
     tailwind.config = {
@@ -31,6 +32,7 @@
 </head>
 <body class="bg-forest-50 text-slate-800 font-sans min-h-screen pb-16">
 
+  <!-- Header / Navbar -->
   <header class="bg-white border-b border-forest-100 sticky top-0 z-10">
     <div class="max-w-3xl mx-auto px-4 py-4 flex justify-between items-center">
       <div class="flex items-center gap-2 cursor-pointer" onclick="handleHeaderTitleClick()">
@@ -40,14 +42,13 @@
         <span class="text-2xl font-bold tracking-tight text-forest-800">regis<span class="text-forest-600">Tree</span></span>
       </div>
       
+      <!-- Action Controls -->
       <div class="flex items-center gap-3">
         <span id="modeBadge" class="text-xs bg-forest-100 text-forest-700 px-3 py-1 rounded-full font-medium hidden">
           Owner View
         </span>
-        <div id="authNavContainer">
-          <button id="authNavBtn" onclick="handleAuthNavClick()" class="text-xs font-semibold text-forest-600 hover:text-forest-800 underline">
-            Owner Login
-          </button>
+        <div id="authNavContainer" class="flex items-center gap-2">
+          <!-- Dynamic navigation items render here -->
         </div>
       </div>
     </div>
@@ -55,11 +56,13 @@
 
   <main class="max-w-3xl mx-auto px-4 pt-8">
     
+    <!-- Toast Notification -->
     <div id="toast" class="fixed top-20 right-4 bg-slate-900 text-white text-xs px-4 py-3 rounded-xl shadow-lg transition-all transform translate-y-[-20px] opacity-0 pointer-events-none z-50 flex items-center gap-2">
       <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
       <span id="toastMsg">Link copied to clipboard!</span>
     </div>
 
+    <!-- regisTree Banner & Header Info -->
     <section class="bg-white rounded-2xl p-6 shadow-sm border border-forest-100 mb-8 space-y-6">
       <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-100 pb-6">
         <div>
@@ -72,6 +75,7 @@
         </div>
       </div>
 
+      <!-- OWNER ONLY: Account Profile Controls -->
       <div id="creatorProfileSection" class="space-y-4 hidden">
         <h3 class="text-sm font-bold text-slate-800 uppercase tracking-wider">Account & Profile Settings</h3>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -87,7 +91,7 @@
 
           <div>
             <label for="userEmailInput" class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1">Account Email</label>
-            <input type="email" id="userEmailInput" placeholder="you@example.com" class="w-full px-3 py-2 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-forest-600 text-sm" />
+            <input type="email" id="userEmailInput" disabled class="w-full px-3 py-2 rounded-lg border border-slate-100 bg-slate-50 text-slate-500 text-sm cursor-not-allowed" />
           </div>
 
           <div>
@@ -115,6 +119,7 @@
       </div>
     </section>
 
+    <!-- OWNER ONLY: Add Item Section -->
     <section id="creatorAddItemSection" class="bg-white rounded-2xl p-6 shadow-sm border border-forest-100 mb-8 hidden">
       <h2 class="text-lg font-semibold text-slate-900 mb-1 flex items-center gap-2">
         <svg class="w-5 h-5 text-forest-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
@@ -132,6 +137,7 @@
       </form>
     </section>
 
+    <!-- Wishlist Container -->
     <section>
       <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
         <div>
@@ -139,6 +145,7 @@
           <span class="text-xs text-slate-400">Clicking "Gift via Venmo" opens Venmo pre-filled</span>
         </div>
 
+        <!-- Sorting Control -->
         <div class="flex items-center gap-2">
           <label for="sortSelect" class="text-xs font-medium text-slate-500 whitespace-nowrap">Sort by:</label>
           <select id="sortSelect" onchange="changeSort(this.value)" class="bg-white border border-slate-200 text-xs font-medium text-slate-700 px-3 py-1.5 rounded-lg focus:outline-none focus:ring-2 focus:ring-forest-600">
@@ -151,21 +158,74 @@
       </div>
       
       <div id="itemList" class="space-y-4">
-        </div>
+        <!-- Dynamic items render here -->
+      </div>
     </section>
 
   </main>
 
+  <!-- AUTHENTICATION MODAL -->
   <div id="authModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm hidden flex items-center justify-center z-50 p-4">
     <div class="bg-white rounded-2xl max-w-sm w-full p-6 shadow-xl border border-slate-100 space-y-4">
       <div class="w-12 h-12 bg-forest-100 rounded-full flex items-center justify-center mx-auto text-forest-700">
         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
       </div>
 
-      <div id="loginViewContainer">
+      <!-- FORM 1: CREATE ACCOUNT -->
+      <div id="signUpViewContainer">
+        <div class="text-center mb-4">
+          <h3 class="text-lg font-semibold text-slate-900">Create Your regisTree</h3>
+          <p class="text-xs text-slate-500 mt-1">Set up your account to start building and sharing your wishlist.</p>
+        </div>
+
+        <form id="signUpForm" class="space-y-3">
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1">Your Name</label>
+            <input type="text" id="signUpName" required placeholder="e.g. Charles" class="w-full px-3 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-forest-600 text-sm" />
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1">Venmo Handle</label>
+            <input type="text" id="signUpVenmo" required placeholder="e.g. Charles-Smith" class="w-full px-3 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-forest-600 text-sm" />
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1">Email Address</label>
+            <input type="email" id="signUpEmail" required placeholder="you@example.com" class="w-full px-3 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-forest-600 text-sm" />
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1">Create Passcode</label>
+            <div class="relative">
+              <input type="password" id="signUpPasscode" required placeholder="Create passcode" class="w-full px-3 py-2 pr-10 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-forest-600 text-sm" />
+              <button type="button" onclick="togglePasswordVisibility('signUpPasscode', 'eyeIconSignUp')" class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600">
+                <svg id="eyeIconSignUp" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <p id="signUpError" class="text-xs text-red-600 hidden font-medium text-center">An account with this email address already exists. Please log in instead.</p>
+
+          <div class="flex gap-2 pt-2">
+            <button type="button" id="signUpCancelBtn" onclick="closeAuthModal()" class="w-full py-2.5 rounded-xl text-sm font-medium text-slate-600 hover:bg-slate-100 transition">Cancel</button>
+            <button type="submit" id="signUpSubmitBtn" class="w-full py-2.5 rounded-xl text-sm font-medium bg-forest-600 hover:bg-forest-700 text-white transition">Create Account</button>
+          </div>
+        </form>
+
+        <div class="text-center pt-4 border-t border-slate-100 mt-4">
+          <p class="text-xs text-slate-500">Already have an owner account?</p>
+          <button onclick="switchToLoginView()" class="text-xs font-bold text-forest-600 hover:underline mt-1">Log In to Existing Registry</button>
+        </div>
+      </div>
+
+      <!-- FORM 2: LOGIN -->
+      <div id="loginViewContainer" class="hidden">
         <div class="text-center mb-4">
           <h3 class="text-lg font-semibold text-slate-900">Owner Login</h3>
-          <p class="text-xs text-slate-500 mt-1">Enter your email and passcode to access Owner View.</p>
+          <p class="text-xs text-slate-500 mt-1">Enter your account email and passcode to manage your regisTree.</p>
         </div>
 
         <form id="loginForm" class="space-y-3">
@@ -190,70 +250,25 @@
           <p id="loginError" class="text-xs text-red-600 hidden font-medium text-center">Invalid email or passcode.</p>
 
           <div class="flex gap-2 pt-2">
-            <button type="button" onclick="closeAuthModal()" class="w-full py-2.5 rounded-xl text-sm font-medium text-slate-600 hover:bg-slate-100 transition">Cancel</button>
-            <button type="submit" class="w-full py-2.5 rounded-xl text-sm font-medium bg-forest-600 hover:bg-forest-700 text-white transition">Log In</button>
+            <button type="button" id="loginCancelBtn" onclick="closeAuthModal()" class="w-full py-2.5 rounded-xl text-sm font-medium text-slate-600 hover:bg-slate-100 transition">Cancel</button>
+            <button type="submit" id="loginSubmitBtn" class="w-full py-2.5 rounded-xl text-sm font-medium bg-forest-600 hover:bg-forest-700 text-white transition">Log In</button>
           </div>
         </form>
 
         <div class="text-center pt-4 border-t border-slate-100 mt-4">
-          <p class="text-xs text-slate-500">Don't have an owner account yet?</p>
-          <button onclick="switchToSignUpView()" class="text-xs font-bold text-forest-600 hover:underline mt-1">Create an Account</button>
-        </div>
-      </div>
-
-      <div id="signUpViewContainer" class="hidden">
-        <div class="text-center mb-4">
-          <h3 class="text-lg font-semibold text-slate-900">Create Owner Account</h3>
-          <p class="text-xs text-slate-500 mt-1">Register an email and passcode to own this regisTree.</p>
-        </div>
-
-        <form id="signUpForm" class="space-y-3">
-          <div>
-            <label class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1">Your Name</label>
-            <input type="text" id="signUpName" required placeholder="e.g. Charles" class="w-full px-3 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-forest-600 text-sm" />
-          </div>
-
-          <div>
-            <label class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1">Venmo Handle</label>
-            <input type="text" id="signUpVenmo" required placeholder="e.g. Charles-Smith" class="w-full px-3 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-forest-600 text-sm" />
-          </div>
-
-          <div>
-            <label class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1">Email Address</label>
-            <input type="email" id="signUpEmail" required placeholder="you@example.com" class="w-full px-3 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-forest-600 text-sm" />
-          </div>
-
-          <div>
-            <label class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1">Set Passcode</label>
-            <div class="relative">
-              <input type="password" id="signUpPasscode" required placeholder="Create passcode" class="w-full px-3 py-2 pr-10 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-forest-600 text-sm" />
-              <button type="button" onclick="togglePasswordVisibility('signUpPasscode', 'eyeIconSignUp')" class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600">
-                <svg id="eyeIconSignUp" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                </svg>
-              </button>
-            </div>
-          </div>
-
-          <div class="flex gap-2 pt-2">
-            <button type="button" onclick="closeAuthModal()" class="w-full py-2.5 rounded-xl text-sm font-medium text-slate-600 hover:bg-slate-100 transition">Cancel</button>
-            <button type="submit" class="w-full py-2.5 rounded-xl text-sm font-medium bg-forest-600 hover:bg-forest-700 text-white transition">Create Account</button>
-          </div>
-        </form>
-
-        <div class="text-center pt-4 border-t border-slate-100 mt-4">
-          <p class="text-xs text-slate-500">Already registered?</p>
-          <button onclick="switchToLoginView()" class="text-xs font-bold text-forest-600 hover:underline mt-1">Log in here</button>
+          <p class="text-xs text-slate-500">Need to create a new registry?</p>
+          <button onclick="switchToSignUpView()" class="text-xs font-bold text-forest-600 hover:underline mt-1">Create Account</button>
         </div>
       </div>
     </div>
   </div>
 
+  <!-- Item Edit & Image Preview Modal (OWNER ONLY) -->
   <div id="editModal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm hidden flex items-center justify-center z-50 p-4">
     <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-xl border border-slate-100 space-y-4">
       <h3 class="text-lg font-semibold text-slate-900" id="editModalHeader">Configure regisTree Item</h3>
       
+      <!-- Live Thumbnail Preview Box -->
       <div class="bg-slate-50 border border-slate-200 rounded-xl p-3 flex items-center gap-4">
         <div class="w-20 h-20 bg-white border border-slate-200 rounded-lg overflow-hidden flex-shrink-0 flex items-center justify-center">
           <img id="modalPreviewImg" src="" alt="Thumbnail preview" class="w-full h-full object-cover hidden" onerror="handleImgError(this)" />
@@ -300,30 +315,18 @@
     </div>
   </div>
 
+  <!-- Application Logic JavaScript -->
   <script>
     // Supabase Credentials
     const SUPABASE_URL = 'https://kzifhsejyezhkmpeyexh.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt6aWZoc2VqeWV6aGttcGV5ZXhoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgwOTIxMjIsImV4cCI6MjEwMzY2ODEyMn0.CDBZE-3ZTO-wBeewYmPsAzmDyRD65vXTTV6g30CNGn0';
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    // Get or Create Persistent Unique Registry ID
-    function getRegistryId() {
-      const params = new URLSearchParams(window.location.search);
-      let id = params.get('id');
-      if (!id) {
-        id = localStorage.getItem('regisTree_active_id');
-        if (!id) {
-          id = 'registree-' + Math.random().toString(36).substring(2, 9);
-          localStorage.setItem('regisTree_active_id', id);
-        }
-        window.history.replaceState(null, '', `?id=${id}`);
-      }
-      return id;
-    }
+    // Dynamic State
+    let activeRegistryId = null;
+    let isOwnerLoggedIn = false;
+    let currentViewMode = 'buyer';
 
-    const currentRegistryId = getRegistryId();
-
-    // regisTree Data State
     let registryData = {
       userName: "",
       userEmail: "",
@@ -332,9 +335,6 @@
       currentSort: "default",
       items: []
     };
-
-    let currentViewMode = 'buyer';
-    let isUnlocked = false;
 
     // DOM Elements
     const itemListEl = document.getElementById('itemList');
@@ -352,6 +352,9 @@
     const authModal = document.getElementById('authModal');
     const loginViewContainer = document.getElementById('loginViewContainer');
     const signUpViewContainer = document.getElementById('signUpViewContainer');
+    const signUpError = document.getElementById('signUpError');
+    const signUpSubmitBtn = document.getElementById('signUpSubmitBtn');
+    const loginSubmitBtn = document.getElementById('loginSubmitBtn');
     
     const modeBadge = document.getElementById('modeBadge');
     const authNavContainer = document.getElementById('authNavContainer');
@@ -368,7 +371,6 @@
       return currencyFormatter.format(amount);
     }
 
-    // URL Protocol Normalizer
     function normalizeUrl(urlString) {
       const trimmed = urlString.trim();
       if (!/^https?:\/\//i.test(trimmed)) {
@@ -377,7 +379,6 @@
       return trimmed;
     }
 
-    // Toggle Eye Passcode Visibility
     function togglePasswordVisibility(inputId, iconId) {
       const input = document.getElementById(inputId);
       const icon = document.getElementById(iconId);
@@ -391,42 +392,79 @@
       }
     }
 
-    // Database Sync Helpers
-    async function loadState() {
-      try {
-        const { data, error } = await supabaseClient
-          .from('registries')
-          .select('*')
-          .eq('id', currentRegistryId)
-          .single();
+    function resetRegistryData() {
+      registryData = {
+        userName: "",
+        userEmail: "",
+        venmoHandle: "",
+        passcode: "",
+        currentSort: "default",
+        items: []
+      };
+    }
 
-        if (data && !error) {
-          registryData = {
-            userName: data.user_name || "",
-            userEmail: data.user_email || "",
-            venmoHandle: data.venmo_handle || "",
-            passcode: data.passcode || "",
-            currentSort: data.current_sort || "default",
-            items: data.items || []
-          };
+    // Load Registry State from Supabase
+    async function loadState() {
+      const urlParams = new URLSearchParams(window.location.search);
+      activeRegistryId = urlParams.get('id');
+
+      if (activeRegistryId) {
+        try {
+          const { data, error } = await supabaseClient
+            .from('registries')
+            .select('id, user_name, user_email, venmo_handle, passcode, current_sort, items')
+            .eq('id', activeRegistryId);
+
+          if (data && data.length > 0 && !error) {
+            const match = data[0];
+            registryData = {
+              userName: match.user_name || "",
+              userEmail: match.user_email || "",
+              venmoHandle: match.venmo_handle || "",
+              passcode: match.passcode || "",
+              currentSort: match.current_sort || "default",
+              items: match.items || []
+            };
+          } else {
+            resetRegistryData();
+          }
+        } catch (err) {
+          console.error("Error fetching registry from Supabase:", err);
+          resetRegistryData();
         }
-      } catch (err) {
-        console.error("Error loading state from Supabase:", err);
+      } else {
+        resetRegistryData();
       }
-      
+
+      // Verify active local session matches loaded registry
+      const localOwnerEmail = localStorage.getItem('regisTree_owner_email');
+      if (localOwnerEmail && registryData.userEmail && localOwnerEmail.toLowerCase().trim() === registryData.userEmail.toLowerCase().trim()) {
+        isOwnerLoggedIn = true;
+      } else {
+        isOwnerLoggedIn = false;
+      }
+
       currentViewMode = 'buyer';
       applyViewModeUI();
       renderRegistry();
+
+      // Show Auth Modal if visiting root directly without a registry ID
+      if (!activeRegistryId) {
+        openAuthModal('signup');
+      }
     }
 
+    // Save Registry State to Supabase
     async function saveState() {
+      if (!activeRegistryId) return;
+
       try {
         await supabaseClient.from('registries').upsert({
-          id: currentRegistryId,
+          id: activeRegistryId,
           user_name: registryData.userName,
-          user_email: registryData.userEmail,
+          user_email: registryData.userEmail.toLowerCase().trim(),
           venmo_handle: registryData.venmoHandle,
-          passcode: registryData.passcode,
+          passcode: String(registryData.passcode).trim(),
           current_sort: registryData.currentSort,
           items: registryData.items,
           updated_at: new Date()
@@ -436,116 +474,211 @@
       }
     }
 
-    // Header Actions & Auth Routing
-    function handleHeaderTitleClick() {
-      currentViewMode = 'buyer';
-      window.history.replaceState(null, '', `?id=${currentRegistryId}&view=buyer`);
-      applyViewModeUI();
-      renderRegistry();
-    }
-
-    function handleAuthNavClick() {
-      if (currentViewMode === 'owner') {
-        currentViewMode = 'buyer';
-        window.history.replaceState(null, '', `?id=${currentRegistryId}&view=buyer`);
-        applyViewModeUI();
-        renderRegistry();
+    // Auth Modal Helpers
+    function openAuthModal(mode = 'signup') {
+      if (mode === 'signup') {
+        switchToSignUpView();
       } else {
-        if (!isUnlocked) {
-          if (!registryData.passcode || !registryData.userEmail) {
-            switchToSignUpView();
-          } else {
-            switchToLoginView();
-          }
-          authModal.classList.remove('hidden');
-        } else {
-          currentViewMode = 'owner';
-          window.history.replaceState(null, '', `?id=${currentRegistryId}`);
-          applyViewModeUI();
-          renderRegistry();
-        }
+        switchToLoginView();
       }
+      authModal.classList.remove('hidden');
     }
 
-    function logoutOwner() {
-      isUnlocked = false;
-      currentViewMode = 'buyer';
-      window.history.replaceState(null, '', `?id=${currentRegistryId}&view=buyer`);
-      applyViewModeUI();
-      renderRegistry();
-      showToast("Logged out successfully.");
+    function closeAuthModal() {
+      if (activeRegistryId) {
+        authModal.classList.add('hidden');
+      }
     }
 
     function switchToLoginView() {
       document.getElementById('loginError').classList.add('hidden');
+      signUpError.classList.add('hidden');
       signUpViewContainer.classList.add('hidden');
       loginViewContainer.classList.remove('hidden');
     }
 
     function switchToSignUpView() {
+      signUpError.classList.add('hidden');
       loginViewContainer.classList.add('hidden');
       signUpViewContainer.classList.remove('hidden');
     }
 
-    function closeAuthModal() {
-      authModal.classList.add('hidden');
-    }
-
-    // Handle Login Form Submission
-    document.getElementById('loginForm').addEventListener('submit', (e) => {
+    // Handle Create Account
+    document.getElementById('signUpForm').addEventListener('submit', async (e) => {
       e.preventDefault();
-      const enteredEmail = document.getElementById('loginEmail').value.trim().toLowerCase();
-      const enteredPasscode = document.getElementById('loginPasscode').value.trim();
+      signUpError.classList.add('hidden');
 
-      if (enteredEmail === (registryData.userEmail || '').toLowerCase() && enteredPasscode === registryData.passcode) {
-        isUnlocked = true;
-        closeAuthModal();
-        currentViewMode = 'owner';
-        window.history.replaceState(null, '', `?id=${currentRegistryId}`);
-        applyViewModeUI();
-        renderRegistry();
-        showToast("Logged in as Owner!");
-      } else {
-        document.getElementById('loginError').classList.remove('hidden');
-      }
-    });
-
-    // Handle Sign Up Form Submission
-    document.getElementById('signUpForm').addEventListener('submit', (e) => {
-      e.preventDefault();
       const name = document.getElementById('signUpName').value.trim();
       const venmo = document.getElementById('signUpVenmo').value.trim().replace(/^@/, '');
       const email = document.getElementById('signUpEmail').value.trim().toLowerCase();
       const passcode = document.getElementById('signUpPasscode').value.trim();
 
-      registryData.userName = name;
-      registryData.venmoHandle = venmo;
-      registryData.userEmail = email;
-      registryData.passcode = passcode;
-      
-      isUnlocked = true;
-      saveState();
-      closeAuthModal();
-      
+      signUpSubmitBtn.disabled = true;
+      signUpSubmitBtn.textContent = 'Checking...';
+
+      try {
+        const { data, error } = await supabaseClient
+          .from('registries')
+          .select('id, user_email')
+          .eq('user_email', email);
+
+        if (data && data.length > 0) {
+          signUpError.classList.remove('hidden');
+          signUpSubmitBtn.disabled = false;
+          signUpSubmitBtn.textContent = 'Create Account';
+          return;
+        }
+      } catch (err) {
+        console.error("Error verifying email uniqueness:", err);
+      }
+
+      const cleanSlug = email.replace(/[^a-z0-9]/g, '-');
+      activeRegistryId = `registree-${cleanSlug}`;
+
+      registryData = {
+        userName: name,
+        userEmail: email,
+        venmoHandle: venmo,
+        passcode: passcode,
+        currentSort: 'default',
+        items: []
+      };
+
+      localStorage.setItem('regisTree_owner_email', email);
+      isOwnerLoggedIn = true;
       currentViewMode = 'owner';
-      window.history.replaceState(null, '', `?id=${currentRegistryId}`);
+
+      await saveState();
+
+      window.history.replaceState(null, '', `?id=${activeRegistryId}`);
+
+      signUpSubmitBtn.disabled = false;
+      signUpSubmitBtn.textContent = 'Create Account';
+
+      closeAuthModal();
       applyViewModeUI();
       renderRegistry();
-      showToast("Owner account created & regisTree saved!");
+      showToast("Account created! Add items below to populate your registry.");
     });
 
+    // Handle Owner Login
+    document.getElementById('loginForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      document.getElementById('loginError').classList.add('hidden');
+      loginSubmitBtn.disabled = true;
+      loginSubmitBtn.textContent = 'Logging in...';
+
+      const enteredEmail = document.getElementById('loginEmail').value.trim().toLowerCase();
+      const enteredPasscode = document.getElementById('loginPasscode').value.trim();
+
+      try {
+        const { data, error } = await supabaseClient
+          .from('registries')
+          .select('id, user_name, user_email, venmo_handle, passcode, current_sort, items')
+          .eq('user_email', enteredEmail);
+
+        if (data && data.length > 0 && !error) {
+          const matchedUser = data.find(row => String(row.passcode).trim() === enteredPasscode);
+
+          if (matchedUser) {
+            activeRegistryId = matchedUser.id;
+            registryData = {
+              userName: matchedUser.user_name || "",
+              userEmail: matchedUser.user_email || "",
+              venmoHandle: matchedUser.venmo_handle || "",
+              passcode: matchedUser.passcode || "",
+              currentSort: matchedUser.current_sort || "default",
+              items: matchedUser.items || []
+            };
+
+            localStorage.setItem('regisTree_owner_email', enteredEmail);
+            isOwnerLoggedIn = true;
+            currentViewMode = 'owner';
+
+            window.history.replaceState(null, '', `?id=${activeRegistryId}`);
+
+            loginSubmitBtn.disabled = false;
+            loginSubmitBtn.textContent = 'Log In';
+
+            closeAuthModal();
+            applyViewModeUI();
+            renderRegistry();
+            showToast("Logged in as Owner!");
+            return;
+          }
+        }
+
+        document.getElementById('loginError').classList.remove('hidden');
+        loginSubmitBtn.disabled = false;
+        loginSubmitBtn.textContent = 'Log In';
+      } catch (err) {
+        console.error("Login Error:", err);
+        document.getElementById('loginError').classList.remove('hidden');
+        loginSubmitBtn.disabled = false;
+        loginSubmitBtn.textContent = 'Log In';
+      }
+    });
+
+    // Navigation Controllers
+    function handleHeaderTitleClick() {
+      if (activeRegistryId) {
+        currentViewMode = 'buyer';
+        applyViewModeUI();
+        renderRegistry();
+      } else {
+        openAuthModal('signup');
+      }
+    }
+
+    function toggleOwnerEditView() {
+      currentViewMode = currentViewMode === 'owner' ? 'buyer' : 'owner';
+      applyViewModeUI();
+      renderRegistry();
+    }
+
+    function logoutOwner() {
+      localStorage.removeItem('regisTree_owner_email');
+      isOwnerLoggedIn = false;
+      currentViewMode = 'buyer';
+      applyViewModeUI();
+      renderRegistry();
+      showToast("Logged out of Owner View.");
+    }
+
+    function createNewRegistry() {
+      activeRegistryId = null;
+      window.history.replaceState(null, '', window.location.pathname);
+      resetRegistryData();
+      renderRegistry();
+      openAuthModal('signup');
+    }
+
     function applyViewModeUI() {
+      if (!activeRegistryId) {
+        document.getElementById('signUpCancelBtn').classList.add('hidden');
+        document.getElementById('loginCancelBtn').classList.add('hidden');
+      } else {
+        document.getElementById('signUpCancelBtn').classList.remove('hidden');
+        document.getElementById('loginCancelBtn').classList.remove('hidden');
+      }
+
       if (currentViewMode === 'buyer') {
         modeBadge.classList.add('hidden');
-        
-        authNavContainer.innerHTML = `
-          <button onclick="handleAuthNavClick()" class="text-xs font-semibold text-forest-600 hover:text-forest-800 underline">
-            ${isUnlocked ? 'Owner View' : 'Owner Login'}
-          </button>`;
+
+        if (isOwnerLoggedIn) {
+          authNavContainer.innerHTML = `
+            <button onclick="toggleOwnerEditView()" class="text-xs font-semibold text-forest-600 hover:text-forest-800 underline">Owner View</button>
+            <span class="text-slate-300">|</span>
+            <button onclick="logoutOwner()" class="text-xs text-slate-400 hover:text-red-600 underline">Log Out</button>`;
+        } else {
+          authNavContainer.innerHTML = `
+            <button onclick="createNewRegistry()" class="text-xs font-semibold text-forest-600 hover:text-forest-800 underline">Create My Own regisTree</button>
+            <span class="text-slate-300">|</span>
+            <button onclick="openAuthModal('login')" class="text-xs text-slate-500 hover:text-slate-700 underline">Owner Login</button>`;
+        }
 
         creatorProfileSection.classList.add('hidden');
         creatorAddItemSection.classList.add('hidden');
-
         registrySubtext.textContent = 'Choose an item to gift via Venmo. Your payment goes directly to the recipient.';
       } else {
         modeBadge.textContent = 'Owner View';
@@ -553,32 +686,22 @@
         modeBadge.classList.remove('hidden');
 
         authNavContainer.innerHTML = `
-          <div class="flex items-center gap-2">
-            <button onclick="handleAuthNavClick()" class="text-xs font-semibold text-forest-600 hover:text-forest-800 underline">
-              Show regisTree
-            </button>
-            <span class="text-slate-300">|</span>
-            <button onclick="logoutOwner()" class="text-xs text-slate-400 hover:text-red-600 underline">
-              Log Out
-            </button>
-          </div>`;
+          <button onclick="toggleOwnerEditView()" class="text-xs font-semibold text-forest-600 hover:text-forest-800 underline">Preview Buyer View</button>
+          <span class="text-slate-300">|</span>
+          <button onclick="logoutOwner()" class="text-xs text-slate-400 hover:text-red-600 underline">Log Out</button>`;
 
         creatorProfileSection.classList.remove('hidden');
         creatorAddItemSection.classList.remove('hidden');
-
         registrySubtext.textContent = 'Directly fund items to cut out shipping delays and packaging waste.';
       }
     }
 
-    // Save Profile Settings
     function saveProfileSettings() {
       const nameInput = document.getElementById('userNameInput').value.trim();
-      const emailInput = document.getElementById('userEmailInput').value.trim();
       const venmoInput = document.getElementById('venmoHandleInput').value.trim().replace(/^@/, '');
       const passInput = document.getElementById('ownerPasscodeInput').value.trim();
 
       if (nameInput) registryData.userName = nameInput;
-      if (emailInput) registryData.userEmail = emailInput;
       if (venmoInput) registryData.venmoHandle = venmoInput;
       if (passInput) registryData.passcode = passInput;
 
@@ -587,9 +710,12 @@
       showToast("Account profile settings saved!");
     }
 
-    // Share regisTree Link Action (Strictly targeting current ID)
     function shareRegistry() {
-      const shareUrl = `${window.location.origin}${window.location.pathname}?id=${currentRegistryId}&view=buyer`;
+      if (!activeRegistryId) {
+        alert("Please create an account first to generate your unique share link.");
+        return;
+      }
+      const shareUrl = `${window.location.origin}${window.location.pathname}?id=${activeRegistryId}`;
       navigator.clipboard.writeText(shareUrl).then(() => {
         showToast("Shareable buyer link copied to clipboard!");
       }).catch(() => {
@@ -618,14 +744,12 @@
       }
     }
 
-    // Change Sorting Option
     function changeSort(sortOption) {
       registryData.currentSort = sortOption;
       saveState();
       renderRegistry();
     }
 
-    // Get Sorted Items Array
     function getSortedItems() {
       let itemsCopy = [...registryData.items];
       switch (registryData.currentSort) {
@@ -641,7 +765,6 @@
       }
     }
 
-    // Async Metadata & Thumbnail Extractor (Microlink API Integration)
     async function extractMetadataFromUrl(urlString) {
       const normalized = normalizeUrl(urlString);
       try {
@@ -684,7 +807,6 @@
       }
     }
 
-    // Modal Live Image Preview Updater
     function updateModalPreview(url) {
       if (url && url.trim()) {
         modalPreviewImg.src = escapeHtml(url.trim());
@@ -697,7 +819,6 @@
       }
     }
 
-    // Fallback Image Error Handler
     function handleImgError(imgElement) {
       imgElement.style.display = 'none';
       if (imgElement.nextElementSibling) {
@@ -705,7 +826,7 @@
       }
     }
 
-    // Main Render Loop
+    // Main Render Function
     function renderRegistry() {
       itemListEl.innerHTML = '';
       updateTitleDisplay();
@@ -734,7 +855,7 @@
         itemListEl.innerHTML = `
           <div class="bg-white p-12 rounded-2xl text-center text-slate-400 border border-slate-100">
             <svg class="w-12 h-12 mx-auto text-slate-300 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"/></svg>
-            <p class="font-medium text-slate-600">Your regisTree is currently empty</p>
+            <p class="font-medium text-slate-600">This regisTree is currently empty</p>
             <p class="text-xs text-slate-400 mt-1">${currentViewMode === 'owner' ? 'Paste a product URL above to add your first item.' : 'Check back later for newly added items.'}</p>
           </div>`;
         return;
@@ -798,4 +919,138 @@
                 </a>
               ` : `
                 <div class="flex items-center justify-end gap-2 w-44 shrink-0">
-                  <span class="
+                  <span class="text-xs text-forest-700 font-medium px-2 py-1 whitespace-nowrap">Purchased</span>
+                  <button onclick="undoFunding('${item.id}')" class="text-xs text-slate-400 hover:text-red-600 underline px-2 py-1 transition whitespace-nowrap">
+                    Undo
+                  </button>
+                </div>
+              `}
+            </div>
+          </div>
+        `;
+        itemListEl.appendChild(itemCard);
+      });
+    }
+
+    // Add Item via URL
+    addItemForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const urlInput = document.getElementById('itemUrl');
+      const rawUrl = urlInput.value.trim();
+      const normalizedUrl = normalizeUrl(rawUrl);
+
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = `<span>Fetching info...</span>`;
+
+      const metadata = await extractMetadataFromUrl(normalizedUrl);
+
+      const newItem = {
+        id: Date.now().toString(),
+        name: metadata.name,
+        price: metadata.price,
+        imageUrl: metadata.imageUrl || '',
+        url: normalizedUrl,
+        funded: false,
+        fundedBy: null
+      };
+
+      registryData.items.unshift(newItem);
+      saveState();
+      renderRegistry();
+      
+      urlInput.value = '';
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = `<span>Plant Item</span>`;
+      
+      openEditModal(newItem.id);
+    });
+
+    // Delete Item
+    function deleteRegistryItem(id) {
+      if (currentViewMode !== 'owner') return;
+
+      const item = registryData.items.find(i => i.id === id);
+      if (item && confirm(`Are you sure you want to delete "${item.name}"?`)) {
+        registryData.items = registryData.items.filter(i => i.id !== id);
+        saveState();
+        renderRegistry();
+      }
+    }
+
+    function deleteModalItem() {
+      const id = document.getElementById('editItemId').value;
+      closeEditModal();
+      deleteRegistryItem(id);
+    }
+
+    // Modal Edit Functions
+    function openEditModal(id) {
+      if (currentViewMode !== 'owner') return;
+
+      const item = registryData.items.find(i => i.id === id);
+      if (!item) return;
+
+      document.getElementById('editItemId').value = item.id;
+      document.getElementById('editItemName').value = item.name;
+      document.getElementById('editItemPrice').value = item.price;
+      document.getElementById('editItemImageUrl').value = item.imageUrl || '';
+      document.getElementById('editItemUrl').value = item.url;
+      
+      updateModalPreview(item.imageUrl);
+      editModal.classList.remove('hidden');
+    }
+
+    function closeEditModal() {
+      editModal.classList.add('hidden');
+    }
+
+    editItemForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const id = document.getElementById('editItemId').value;
+      const item = registryData.items.find(i => i.id === id);
+
+      if (item) {
+        item.name = document.getElementById('editItemName').value.trim();
+        item.price = parseFloat(document.getElementById('editItemPrice').value) || 0;
+        item.imageUrl = document.getElementById('editItemImageUrl').value.trim();
+        item.url = normalizeUrl(document.getElementById('editItemUrl').value);
+        saveState();
+        renderRegistry();
+      }
+
+      closeEditModal();
+    });
+
+    // Gift via Venmo Action
+    function markAsFunded(id) {
+      const item = registryData.items.find(i => i.id === id);
+      if (item && !item.funded) {
+        const gifterName = prompt("Enter your name so the recipient knows who gifted this item:", "Anonymous");
+        item.funded = true;
+        item.fundedBy = gifterName || "Anonymous";
+        saveState();
+        setTimeout(renderRegistry, 300);
+      }
+    }
+
+    function undoFunding(id) {
+      const item = registryData.items.find(i => i.id === id);
+      if (item && item.funded) {
+        item.funded = false;
+        item.fundedBy = null;
+        saveState();
+        renderRegistry();
+      }
+    }
+
+    function escapeHtml(str) {
+      return str.replace(/[&<>"']/g, function(m) {
+        return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[m];
+      });
+    }
+
+    // Initialize Application
+    loadState();
+  </script>
+</body>
+</html>
