@@ -151,15 +151,26 @@
           <span class="text-xs text-slate-400">Clicking "Gift via Venmo" opens Venmo pre-filled</span>
         </div>
 
-        <!-- Sorting Control -->
-        <div class="flex items-center gap-2">
-          <label for="sortSelect" class="text-xs font-medium text-slate-500 whitespace-nowrap">Sort by:</label>
-          <select id="sortSelect" onchange="changeSort(this.value)" class="bg-white border border-slate-200 text-xs font-medium text-slate-700 px-3 py-1.5 rounded-lg focus:outline-none focus:ring-2 focus:ring-forest-600">
-            <option value="default">Recently Added</option>
-            <option value="price-desc">Price: High to Low</option>
-            <option value="price-asc">Price: Low to High</option>
-            <option value="alpha">Alphabetical (A–Z)</option>
-          </select>
+        <!-- Sorting & Filtering Controls -->
+        <div class="flex flex-wrap items-center gap-2">
+          <div class="flex items-center gap-1.5">
+            <label for="filterSelect" class="text-xs font-medium text-slate-500 whitespace-nowrap">Show:</label>
+            <select id="filterSelect" onchange="changeFilter(this.value)" class="bg-white border border-slate-200 text-xs font-medium text-slate-700 px-3 py-1.5 rounded-lg focus:outline-none focus:ring-2 focus:ring-forest-600">
+              <option value="all">All Items</option>
+              <option value="available">Available Only</option>
+              <option value="funded">Funded Only</option>
+            </select>
+          </div>
+
+          <div class="flex items-center gap-1.5">
+            <label for="sortSelect" class="text-xs font-medium text-slate-500 whitespace-nowrap">Sort:</label>
+            <select id="sortSelect" onchange="changeSort(this.value)" class="bg-white border border-slate-200 text-xs font-medium text-slate-700 px-3 py-1.5 rounded-lg focus:outline-none focus:ring-2 focus:ring-forest-600">
+              <option value="default">Recently Added</option>
+              <option value="price-desc">Price: High to Low</option>
+              <option value="price-asc">Price: Low to High</option>
+              <option value="alpha">Alphabetical (A–Z)</option>
+            </select>
+          </div>
         </div>
       </div>
       
@@ -410,6 +421,7 @@
       userEmail: "",
       venmoHandle: "",
       passcode: "",
+      currentFilter: "all",
       currentSort: "default",
       items: []
     };
@@ -490,6 +502,7 @@
         userEmail: "",
         venmoHandle: "",
         passcode: "",
+        currentFilter: "all",
         currentSort: "default",
         items: []
       };
@@ -507,7 +520,7 @@
         try {
           const { data, error } = await supabaseClient
             .from('registries')
-            .select('id, user_name, user_email, venmo_handle, passcode, current_sort, items')
+            .select('id, user_name, user_email, venmo_handle, passcode, current_filter, current_sort, items')
             .eq('id', activeRegistryId);
 
           if (data && data.length > 0 && !error) {
@@ -517,6 +530,7 @@
               userEmail: match.user_email || "",
               venmoHandle: match.venmo_handle || "",
               passcode: match.passcode || "",
+              currentFilter: match.current_filter || "all",
               currentSort: match.current_sort || "default",
               items: match.items || []
             };
@@ -543,12 +557,9 @@
       currentViewMode = 'buyer';
       applyViewModeUI();
       renderRegistry();
-
-      // If no registry ID is specified in the URL, do not force open the auth modal, 
-      // allowing visitors to see the search bar immediately.
     }
 
-    // Search by Venmo ID Handle Event Listener (Displays ALL matching lists)
+    // Search by Venmo ID Handle Event Listener
     document.getElementById('searchVenmoForm').addEventListener('submit', async (e) => {
       e.preventDefault();
       const searchError = document.getElementById('searchError');
@@ -616,6 +627,7 @@
           user_email: registryData.userEmail.toLowerCase().trim(),
           venmo_handle: registryData.venmoHandle,
           passcode: String(registryData.passcode).trim(),
+          current_filter: registryData.currentFilter,
           current_sort: registryData.currentSort,
           items: registryData.items,
           updated_at: new Date()
@@ -679,6 +691,7 @@
               user_email: email,
               venmo_handle: venmo,
               passcode: passcode,
+              current_filter: 'all',
               current_sort: 'default',
               items: [],
               failed_attempts: 0,
@@ -701,6 +714,7 @@
           userEmail: email,
           venmoHandle: venmo,
           passcode: passcode,
+          currentFilter: 'all',
           currentSort: 'default',
           items: []
         };
@@ -742,7 +756,7 @@
       try {
         const { data, error } = await supabaseClient
           .from('registries')
-          .select('id, user_name, user_email, venmo_handle, passcode, current_sort, items, failed_attempts, is_locked')
+          .select('id, user_name, user_email, venmo_handle, passcode, current_filter, current_sort, items, failed_attempts, is_locked')
           .eq('user_email', enteredEmail);
 
         if (data && data.length > 0 && !error) {
@@ -768,6 +782,7 @@
               userEmail: userAccount.user_email || "",
               venmoHandle: userAccount.venmo_handle || "",
               passcode: userAccount.passcode || "",
+              currentFilter: userAccount.current_filter || "all",
               currentSort: userAccount.current_sort || "default",
               items: userAccount.items || []
             };
@@ -826,7 +841,7 @@
       }
     });
 
-    // Forgot Password & Lockout Recovery Handler (Protected with confirm prompt)
+    // Forgot Password & Lockout Recovery Handler
     async function handleForgotPassword() {
       const emailInput = document.getElementById('loginEmail').value.trim().toLowerCase();
       
@@ -976,14 +991,29 @@
       }
     }
 
+    function changeFilter(filterOption) {
+      registryData.currentFilter = filterOption;
+      saveState();
+      renderRegistry();
+    }
+
     function changeSort(sortOption) {
       registryData.currentSort = sortOption;
       saveState();
       renderRegistry();
     }
 
-    function getSortedItems() {
+    function getFilteredAndSortedItems() {
       let itemsCopy = [...registryData.items];
+
+      // Apply Filter
+      if (registryData.currentFilter === 'available') {
+        itemsCopy = itemsCopy.filter(item => !item.funded);
+      } else if (registryData.currentFilter === 'funded') {
+        itemsCopy = itemsCopy.filter(item => item.funded);
+      }
+
+      // Apply Sort
       switch (registryData.currentSort) {
         case 'price-desc':
           return itemsCopy.sort((a, b) => b.price - a.price);
@@ -1067,18 +1097,30 @@
       if (registryData.passcode && document.getElementById('ownerPasscodeInput')) {
         document.getElementById('ownerPasscodeInput').value = registryData.passcode;
       }
+      if (document.getElementById('filterSelect')) {
+        document.getElementById('filterSelect').value = registryData.currentFilter || 'all';
+      }
       if (document.getElementById('sortSelect')) {
         document.getElementById('sortSelect').value = registryData.currentSort || 'default';
       }
 
-      const visibleItems = getSortedItems();
+      const visibleItems = getFilteredAndSortedItems();
 
-      if (visibleItems.length === 0) {
+      if (registryData.items.length === 0) {
         itemListEl.innerHTML = `
           <div class="bg-white p-12 rounded-2xl text-center text-slate-400 border border-slate-100">
             <svg class="w-12 h-12 mx-auto text-slate-300 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"/></svg>
             <p class="font-medium text-slate-600">This regisTree is currently empty</p>
             <p class="text-xs text-slate-400 mt-1">${currentViewMode === 'owner' ? 'Paste a product URL above to add your first item.' : 'Check back later for newly added items.'}</p>
+          </div>`;
+        return;
+      }
+
+      if (visibleItems.length === 0) {
+        itemListEl.innerHTML = `
+          <div class="bg-white p-8 rounded-2xl text-center text-slate-400 border border-slate-100">
+            <p class="font-medium text-slate-600 text-sm">No items match the selected filter ("${registryData.currentFilter}")</p>
+            <button onclick="changeFilter('all')" class="mt-2 text-xs font-semibold text-forest-600 hover:underline">Show All Items</button>
           </div>`;
         return;
       }
