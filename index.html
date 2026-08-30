@@ -42,13 +42,13 @@
         <span class="text-2xl font-bold tracking-tight text-forest-800">regis<span class="text-forest-600">Tree</span></span>
       </div>
       
-      <!-- Mode Badge & Owner Access Button -->
+      <!-- Mode Badge & Authentication Navigation -->
       <div class="flex items-center gap-3">
         <span id="modeBadge" class="text-xs bg-forest-100 text-forest-700 px-3 py-1 rounded-full font-medium hidden">
           Owner View
         </span>
-        <button id="toggleViewBtn" onclick="requestOwnerAccess()" class="text-xs font-semibold text-forest-600 hover:text-forest-800 underline">
-          Owner View
+        <button id="authNavBtn" onclick="requestOwnerAccess()" class="text-xs font-semibold text-forest-600 hover:text-forest-800 underline">
+          Owner Login
         </button>
       </div>
     </div>
@@ -75,17 +75,13 @@
         </div>
       </div>
 
-      <!-- OWNER ONLY: Profile Inputs & Security Setup -->
+      <!-- OWNER ONLY: Account & Profile Management -->
       <div id="creatorProfileSection" class="space-y-4 hidden">
+        <h3 class="text-sm font-bold text-slate-800 uppercase tracking-wider">Account & Profile Settings</h3>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label for="userNameInput" class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1">Your Name</label>
             <input type="text" id="userNameInput" placeholder="e.g. Charles" class="w-full px-3 py-2 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-forest-600 text-sm" />
-          </div>
-
-          <div>
-            <label for="userEmailInput" class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1">Email Address (For Recovery)</label>
-            <input type="email" id="userEmailInput" placeholder="you@example.com" class="w-full px-3 py-2 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-forest-600 text-sm" />
           </div>
 
           <div>
@@ -94,7 +90,12 @@
           </div>
 
           <div>
-            <label for="ownerPasscodeInput" class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1">Edit Passcode</label>
+            <label for="userEmailInput" class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1">Account Email Address</label>
+            <input type="email" id="userEmailInput" placeholder="you@example.com" class="w-full px-3 py-2 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-forest-600 text-sm" />
+          </div>
+
+          <div>
+            <label for="ownerPasscodeInput" class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1">Account Passcode</label>
             <div class="relative">
               <input type="password" id="ownerPasscodeInput" placeholder="Set passcode to lock editing" class="w-full px-3 py-2 pr-10 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-forest-600 text-sm" />
               <button type="button" onclick="togglePasswordVisibility('ownerPasscodeInput', 'eyeIcon1')" class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600">
@@ -124,11 +125,11 @@
         <svg class="w-5 h-5 text-forest-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
         Add an Item via URL
       </h2>
-      <p class="text-slate-500 text-xs mb-4">Paste any link from an online merchant. We'll extract details and thumbnail image.</p>
+      <p class="text-slate-500 text-xs mb-4">Paste any link from an online merchant. We'll extract details and preview the thumbnail image.</p>
       
       <form id="addItemForm" class="space-y-3">
         <div class="flex flex-col sm:flex-row gap-2">
-          <input type="text" id="itemUrl" required class="flex-grow px-4 py-2.5 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-forest-600 text-sm" />
+          <input type="text" id="itemUrl" required placeholder="https://www.amazon.com/dp/..." class="flex-grow px-4 py-2.5 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-forest-600 text-sm" />
           <button type="submit" id="submitBtn" class="bg-forest-600 hover:bg-forest-700 text-white font-medium px-6 py-2.5 rounded-lg transition text-sm flex items-center justify-center gap-2 whitespace-nowrap">
             <span>Plant Item</span>
           </button>
@@ -163,40 +164,66 @@
 
   </main>
 
-  <!-- Passcode Verification Modal -->
-  <div id="passcodeModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm hidden flex items-center justify-center z-50 p-4">
+  <!-- Owner Authentication / Registration Modal -->
+  <div id="authModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm hidden flex items-center justify-center z-50 p-4">
     <div class="bg-white rounded-2xl max-w-sm w-full p-6 shadow-xl border border-slate-100 space-y-4 text-center">
       <div class="w-12 h-12 bg-forest-100 rounded-full flex items-center justify-center mx-auto text-forest-700">
         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
       </div>
       <div>
-        <h3 class="text-lg font-semibold text-slate-900">Owner Passcode Required</h3>
-        <p class="text-xs text-slate-500 mt-1">Enter your passcode to access Owner View and manage your regisTree.</p>
+        <h3 class="text-lg font-semibold text-slate-900" id="authModalTitle">Owner Account Access</h3>
+        <p class="text-xs text-slate-500 mt-1" id="authModalSubtext">Log in with your account email and passcode to edit this regisTree.</p>
       </div>
-      <form id="passcodeForm" class="space-y-3">
-        <div class="relative">
-          <input type="password" id="inputVerifyPasscode" required placeholder="Enter passcode" class="w-full px-4 py-2.5 text-center rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-forest-600 text-sm" />
-          <button type="button" onclick="togglePasswordVisibility('inputVerifyPasscode', 'eyeIcon2')" class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600">
-            <svg id="eyeIcon2" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-            </svg>
-          </button>
+
+      <form id="authForm" class="space-y-3 text-left">
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1">Account Email</label>
+          <input type="email" id="inputAuthEmail" required placeholder="you@example.com" class="w-full px-3 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-forest-600 text-sm" />
         </div>
-        <p id="passcodeError" class="text-xs text-red-600 hidden font-medium">Incorrect passcode. Please try again.</p>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1">Passcode</label>
+          <div class="relative">
+            <input type="password" id="inputAuthPasscode" required placeholder="Enter passcode" class="w-full px-3 py-2 pr-10 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-forest-600 text-sm" />
+            <button type="button" onclick="togglePasswordVisibility('inputAuthPasscode', 'eyeIcon2')" class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600">
+              <svg id="eyeIcon2" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <p id="authError" class="text-xs text-red-600 hidden font-medium text-center">Invalid email address or passcode.</p>
+
         <div class="flex gap-2 pt-2">
-          <button type="button" onclick="closePasscodeModal()" class="w-full py-2.5 rounded-xl text-sm font-medium text-slate-600 hover:bg-slate-100 transition">Cancel</button>
-          <button type="submit" class="w-full py-2.5 rounded-xl text-sm font-medium bg-forest-600 hover:bg-forest-700 text-white transition">Unlock</button>
+          <button type="button" onclick="closeAuthModal()" class="w-full py-2.5 rounded-xl text-sm font-medium text-slate-600 hover:bg-slate-100 transition">Cancel</button>
+          <button type="submit" class="w-full py-2.5 rounded-xl text-sm font-medium bg-forest-600 hover:bg-forest-700 text-white transition">Submit</button>
         </div>
-        <button type="button" onclick="handleForgotPasscode()" class="text-xs text-slate-400 hover:text-slate-600 underline pt-1 block mx-auto">Forgot passcode?</button>
       </form>
     </div>
   </div>
 
-  <!-- Edit Item Modal (OWNER ONLY) -->
+  <!-- Item Edit & Image Preview Modal (OWNER ONLY) -->
   <div id="editModal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm hidden flex items-center justify-center z-50 p-4">
     <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-xl border border-slate-100 space-y-4">
-      <h3 class="text-lg font-semibold text-slate-900">Edit regisTree Item</h3>
+      <h3 class="text-lg font-semibold text-slate-900" id="editModalHeader">Configure regisTree Item</h3>
+      
+      <!-- Live Thumbnail Preview Box -->
+      <div class="bg-slate-50 border border-slate-200 rounded-xl p-3 flex items-center gap-4">
+        <div class="w-20 h-20 bg-white border border-slate-200 rounded-lg overflow-hidden flex-shrink-0 flex items-center justify-center">
+          <img id="modalPreviewImg" src="" alt="Thumbnail preview" class="w-full h-full object-cover hidden" onerror="handleImgError(this)" />
+          <div id="modalPreviewPlaceholder" class="flex flex-col items-center justify-center text-slate-400 text-center p-2">
+            <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+            <span class="text-[10px] leading-tight">No Preview</span>
+          </div>
+        </div>
+        <div class="text-xs text-slate-500">
+          <span class="font-semibold block text-slate-700">Thumbnail Preview</span>
+          <p class="mt-0.5">Edit the title, price, or image link below to update this item card.</p>
+        </div>
+      </div>
+
       <form id="editItemForm" class="space-y-3">
         <input type="hidden" id="editItemId" />
         <div>
@@ -209,7 +236,7 @@
         </div>
         <div>
           <label class="text-xs font-semibold text-slate-500 uppercase tracking-wider block mb-1">Thumbnail Image URL</label>
-          <input type="text" id="editItemImageUrl" placeholder="https://domain.com/image.jpg" class="w-full px-3 py-2 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-forest-600 text-sm" />
+          <input type="text" id="editItemImageUrl" placeholder="https://domain.com/image.jpg" oninput="updateModalPreview(this.value)" class="w-full px-3 py-2 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-forest-600 text-sm" />
         </div>
         <div>
           <label class="text-xs font-semibold text-slate-500 uppercase tracking-wider block mb-1">Product URL</label>
@@ -271,13 +298,17 @@
     const registryTitle = document.getElementById('registryTitle');
     const registrySubtext = document.getElementById('registrySubtext');
     const submitBtn = document.getElementById('submitBtn');
+    
     const editModal = document.getElementById('editModal');
     const editItemForm = document.getElementById('editItemForm');
-    const passcodeModal = document.getElementById('passcodeModal');
-    const passcodeForm = document.getElementById('passcodeForm');
+    const modalPreviewImg = document.getElementById('modalPreviewImg');
+    const modalPreviewPlaceholder = document.getElementById('modalPreviewPlaceholder');
+
+    const authModal = document.getElementById('authModal');
+    const authForm = document.getElementById('authForm');
     
     const modeBadge = document.getElementById('modeBadge');
-    const toggleViewBtn = document.getElementById('toggleViewBtn');
+    const authNavBtn = document.getElementById('authNavBtn');
     const creatorProfileSection = document.getElementById('creatorProfileSection');
     const creatorAddItemSection = document.getElementById('creatorAddItemSection');
 
@@ -300,7 +331,7 @@
       return trimmed;
     }
 
-    // Toggle Eye Passcode Visibility
+    // Eye Password Visibility Toggle
     function togglePasswordVisibility(inputId, iconId) {
       const input = document.getElementById(inputId);
       const icon = document.getElementById(iconId);
@@ -337,11 +368,8 @@
         console.error("Error loading state from Supabase:", err);
       }
       
-      // Strict Security: If passcode exists, default to Buyer view until authenticated
-      if (!registryData.passcode) {
-        isUnlocked = true;
-        currentViewMode = 'owner';
-      } else {
+      // Mandatory Security: Always default to buyer mode if account email/passcode is set
+      if (registryData.userEmail && registryData.passcode && !isUnlocked) {
         currentViewMode = 'buyer';
       }
       
@@ -366,7 +394,7 @@
       }
     }
 
-    // View Mode & Security Controller
+    // Explicit Owner Account Authentication Controller
     function requestOwnerAccess() {
       if (currentViewMode === 'owner') {
         currentViewMode = 'buyer';
@@ -374,8 +402,9 @@
         applyViewModeUI();
         renderRegistry();
       } else {
-        if (registryData.passcode && !isUnlocked) {
-          openPasscodeModal();
+        // Require Email + Passcode login
+        if (!isUnlocked) {
+          openAuthModal();
         } else {
           currentViewMode = 'owner';
           window.history.replaceState(null, '', `?id=${currentRegistryId}`);
@@ -385,44 +414,64 @@
       }
     }
 
-    function openPasscodeModal() {
-      document.getElementById('inputVerifyPasscode').value = '';
-      document.getElementById('passcodeError').classList.add('hidden');
-      passcodeModal.classList.remove('hidden');
+    function openAuthModal() {
+      document.getElementById('inputAuthEmail').value = registryData.userEmail || '';
+      document.getElementById('inputAuthPasscode').value = '';
+      document.getElementById('authError').classList.add('hidden');
+
+      if (!registryData.userEmail || !registryData.passcode) {
+        document.getElementById('authModalTitle').textContent = "Create Owner Account";
+        document.getElementById('authModalSubtext').textContent = "Set your account email address and passcode to register ownership of this regisTree.";
+      } else {
+        document.getElementById('authModalTitle').textContent = "Owner Account Access";
+        document.getElementById('authModalSubtext').textContent = "Log in with your registered account email and passcode.";
+      }
+
+      authModal.classList.remove('hidden');
     }
 
-    function closePasscodeModal() {
-      passcodeModal.classList.add('hidden');
+    function closeAuthModal() {
+      authModal.classList.add('hidden');
     }
 
-    passcodeForm.addEventListener('submit', (e) => {
+    authForm.addEventListener('submit', (e) => {
       e.preventDefault();
-      const entered = document.getElementById('inputVerifyPasscode').value.trim();
-      if (entered === registryData.passcode) {
+      const enteredEmail = document.getElementById('inputAuthEmail').value.trim().toLowerCase();
+      const enteredPasscode = document.getElementById('inputAuthPasscode').value.trim();
+
+      // Unset regisTree Registration Step
+      if (!registryData.userEmail || !registryData.passcode) {
+        registryData.userEmail = enteredEmail;
+        registryData.passcode = enteredPasscode;
         isUnlocked = true;
-        closePasscodeModal();
+        saveState();
+        closeAuthModal();
         currentViewMode = 'owner';
         window.history.replaceState(null, '', `?id=${currentRegistryId}`);
         applyViewModeUI();
         renderRegistry();
-        showToast("Unlocked Owner View!");
+        showToast("Account created & Owner View unlocked!");
+        return;
+      }
+
+      // Existing Account Authentication Step
+      if (enteredEmail === registryData.userEmail.toLowerCase() && enteredPasscode === registryData.passcode) {
+        isUnlocked = true;
+        closeAuthModal();
+        currentViewMode = 'owner';
+        window.history.replaceState(null, '', `?id=${currentRegistryId}`);
+        applyViewModeUI();
+        renderRegistry();
+        showToast("Logged in as Owner!");
       } else {
-        document.getElementById('passcodeError').classList.remove('hidden');
+        document.getElementById('authError').classList.remove('hidden');
       }
     });
-
-    function handleForgotPasscode() {
-      if (registryData.userEmail) {
-        alert(`A password reset link would be sent to ${registryData.userEmail}.`);
-      } else {
-        alert("No email address was saved for this regisTree. Contact support or create a new regisTree.");
-      }
-    }
 
     function applyViewModeUI() {
       if (currentViewMode === 'buyer') {
         modeBadge.classList.add('hidden');
-        toggleViewBtn.textContent = 'Owner View';
+        authNavBtn.textContent = 'Owner Login';
         
         creatorProfileSection.classList.add('hidden');
         creatorAddItemSection.classList.add('hidden');
@@ -433,7 +482,7 @@
         modeBadge.className = 'text-xs bg-forest-100 text-forest-700 px-3 py-1 rounded-full font-medium';
         modeBadge.classList.remove('hidden');
 
-        toggleViewBtn.textContent = 'Show regisTree';
+        authNavBtn.textContent = 'Show regisTree';
 
         creatorProfileSection.classList.remove('hidden');
         creatorAddItemSection.classList.remove('hidden');
@@ -452,14 +501,11 @@
       if (nameInput) registryData.userName = nameInput;
       if (emailInput) registryData.userEmail = emailInput;
       if (venmoInput) registryData.venmoHandle = venmoInput;
-      if (passInput) {
-        registryData.passcode = passInput;
-        isUnlocked = true;
-      }
+      if (passInput) registryData.passcode = passInput;
 
       saveState();
       renderRegistry();
-      showToast("Profile settings saved!");
+      showToast("Account profile settings saved!");
     }
 
     // Share regisTree Link Action
@@ -486,7 +532,7 @@
 
     function updateTitleDisplay() {
       if (registryData.userName) {
-        const ending = registryData.userName.endsWith('s') || registryData.userName.endsWith('S') ? "'s" : "'s";
+        const ending = registryData.userName.endsWith('s') || registryData.userName.endsWith('S') ? "'" : "'s";
         registryTitle.textContent = `${registryData.userName}${ending} regisTree`;
       } else {
         registryTitle.textContent = 'My regisTree';
@@ -559,7 +605,20 @@
       }
     }
 
-    // Fallback Image Handler
+    // Modal Live Image Preview Updater
+    function updateModalPreview(url) {
+      if (url && url.trim()) {
+        modalPreviewImg.src = escapeHtml(url.trim());
+        modalPreviewImg.classList.remove('hidden');
+        modalPreviewPlaceholder.classList.add('hidden');
+      } else {
+        modalPreviewImg.src = '';
+        modalPreviewImg.classList.add('hidden');
+        modalPreviewPlaceholder.classList.remove('hidden');
+      }
+    }
+
+    // Fallback Image Error Handler
     function handleImgError(imgElement) {
       imgElement.style.display = 'none';
       if (imgElement.nextElementSibling) {
@@ -674,7 +733,7 @@
       });
     }
 
-    // Add Item Form Handler (Async with Image Scraping)
+    // Add Item Form Handler (Async with Image Scraping & Immediate Modal Preview)
     addItemForm.addEventListener('submit', async (e) => {
       e.preventDefault();
       const urlInput = document.getElementById('itemUrl');
@@ -725,7 +784,7 @@
       deleteRegistryItem(id);
     }
 
-    // Edit Modal Logic
+    // Edit & Preview Modal Logic
     function openEditModal(id) {
       if (currentViewMode !== 'owner') return;
 
@@ -738,6 +797,7 @@
       document.getElementById('editItemImageUrl').value = item.imageUrl || '';
       document.getElementById('editItemUrl').value = item.url;
       
+      updateModalPreview(item.imageUrl);
       editModal.classList.remove('hidden');
     }
 
