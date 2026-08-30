@@ -712,7 +712,7 @@
     function markAsFunded(id) {
       const item = registryData.items.find(i => i.id === id);
       if (item && !item.funded) {
-        const gifterName = prompt("Enter your name so the recipient knows who gifted this item:", "A Friend");
+        const gifterName = prompt("Enter your name so the recipient knows who gifted this item:", "Anonymous");
         item.funded = true;
         item.fundedBy = gifterName || "Anonymous";
         saveState();
