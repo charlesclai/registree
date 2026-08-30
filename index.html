@@ -39,18 +39,33 @@
         </svg>
         <span class="text-2xl font-bold tracking-tight text-forest-800">regis<span class="text-forest-600">Tree</span></span>
       </div>
-      <span class="text-xs bg-forest-100 text-forest-700 px-3 py-1 rounded-full font-medium">Branching Out Gifting</span>
+      
+      <!-- Mode Badge & Owner Toggle Button -->
+      <div class="flex items-center gap-2">
+        <span id="modeBadge" class="text-xs bg-forest-100 text-forest-700 px-3 py-1 rounded-full font-medium">
+          Owner View
+        </span>
+        <button id="toggleViewBtn" onclick="toggleViewMode()" class="text-xs text-slate-500 hover:text-slate-800 underline ml-2">
+          Show Registry
+        </button>
+      </div>
     </div>
   </header>
 
   <main class="max-w-3xl mx-auto px-4 pt-8">
     
-    <!-- Registry Banner & Setup Info -->
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed top-20 right-4 bg-slate-900 text-white text-xs px-4 py-3 rounded-xl shadow-lg transition-all transform translate-y-[-20px] opacity-0 pointer-events-none z-50 flex items-center gap-2">
+      <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+      <span id="toastMsg">Link copied to clipboard!</span>
+    </div>
+
+    <!-- Registry Banner & Header Info -->
     <section class="bg-white rounded-2xl p-6 shadow-sm border border-forest-100 mb-8 space-y-6">
       <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-100 pb-6">
         <div>
           <h1 class="text-2xl font-bold text-slate-900" id="registryTitle">My regisTree</h1>
-          <p class="text-slate-500 text-sm mt-1">Directly fund items to cut out shipping delays and packaging waste.</p>
+          <p class="text-slate-500 text-sm mt-1" id="registrySubtext">Directly fund items to cut out shipping delays and packaging waste.</p>
         </div>
         <div class="bg-wood-100 p-3.5 rounded-xl border border-wood-500/20 text-xs text-wood-800">
           <span class="font-semibold block text-slate-700 mb-0.5">Recipient Venmo:</span>
@@ -58,28 +73,37 @@
         </div>
       </div>
 
-      <!-- Recipient Profile Inputs -->
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div>
-          <label for="userNameInput" class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1">Your Name</label>
-          <div class="flex gap-2">
-            <input type="text" id="userNameInput" placeholder="e.g. Charles" class="w-full px-3 py-2 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-forest-600 text-sm" />
-            <button type="button" onclick="updateUserName()" class="bg-slate-800 hover:bg-slate-900 text-white text-xs font-medium px-4 py-2 rounded-lg transition">Save</button>
+      <!-- OWNER ONLY: Profile Inputs & Share Button -->
+      <div id="creatorProfileSection" class="space-y-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label for="userNameInput" class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1">Your Name</label>
+            <div class="flex gap-2">
+              <input type="text" id="userNameInput" placeholder="e.g. Charles" class="w-full px-3 py-2 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-forest-600 text-sm" />
+              <button type="button" onclick="updateUserName()" class="bg-slate-800 hover:bg-slate-900 text-white text-xs font-medium px-4 py-2 rounded-lg transition">Save</button>
+            </div>
+          </div>
+
+          <div>
+            <label for="venmoHandleInput" class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1">Your Venmo Handle</label>
+            <div class="flex gap-2">
+              <input type="text" id="venmoHandleInput" placeholder="e.g. Charles-Smith" class="w-full px-3 py-2 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-forest-600 text-sm" />
+              <button type="button" onclick="updateVenmoHandle()" class="bg-slate-800 hover:bg-slate-900 text-white text-xs font-medium px-4 py-2 rounded-lg transition">Save</button>
+            </div>
           </div>
         </div>
 
-        <div>
-          <label for="venmoHandleInput" class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1">Your Venmo Handle</label>
-          <div class="flex gap-2">
-            <input type="text" id="venmoHandleInput" placeholder="e.g. Charles-Smith" class="w-full px-3 py-2 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-forest-600 text-sm" />
-            <button type="button" onclick="updateVenmoHandle()" class="bg-slate-800 hover:bg-slate-900 text-white text-xs font-medium px-4 py-2 rounded-lg transition">Save</button>
-          </div>
+        <div class="pt-2 border-t border-slate-50 flex justify-end">
+          <button onclick="shareRegistry()" class="bg-wood-500 hover:bg-wood-800 text-white text-sm font-medium px-5 py-2.5 rounded-xl transition flex items-center gap-2 shadow-sm">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/></svg>
+            <span>Share Registry Link</span>
+          </button>
         </div>
       </div>
     </section>
 
-    <!-- Add Item Section (Recipient View) -->
-    <section class="bg-white rounded-2xl p-6 shadow-sm border border-forest-100 mb-8">
+    <!-- OWNER ONLY: Add Item Section -->
+    <section id="creatorAddItemSection" class="bg-white rounded-2xl p-6 shadow-sm border border-forest-100 mb-8">
       <h2 class="text-lg font-semibold text-slate-900 mb-1 flex items-center gap-2">
         <svg class="w-5 h-5 text-forest-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
         Add an Item via URL
@@ -96,7 +120,7 @@
       </form>
     </section>
 
-    <!-- Wishlist Container -->
+    <!-- Wishlist Container (Visible to Both Views) -->
     <section>
       <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
         <div>
@@ -123,7 +147,7 @@
 
   </main>
 
-  <!-- Edit Item Modal -->
+  <!-- Edit Item Modal (OWNER ONLY) -->
   <div id="editModal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm hidden flex items-center justify-center z-50 p-4">
     <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-xl border border-slate-100 space-y-4">
       <h3 class="text-lg font-semibold text-slate-900">Edit Registry Item</h3>
@@ -141,9 +165,15 @@
           <label class="text-xs font-semibold text-slate-500 uppercase tracking-wider block mb-1">Product URL</label>
           <input type="text" id="editItemUrl" required class="w-full px-3 py-2 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-forest-600 text-sm" />
         </div>
-        <div class="flex justify-end gap-2 pt-2">
-          <button type="button" onclick="closeEditModal()" class="px-4 py-2 rounded-lg text-sm font-medium text-slate-600 hover:bg-slate-100 transition">Cancel</button>
-          <button type="submit" class="px-4 py-2 rounded-lg text-sm font-medium bg-forest-600 hover:bg-forest-700 text-white transition">Save Changes</button>
+        <div class="flex justify-between items-center pt-2">
+          <button type="button" onclick="deleteModalItem()" class="px-3 py-2 rounded-lg text-sm font-medium text-red-600 hover:bg-red-50 transition flex items-center gap-1">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+            Delete Item
+          </button>
+          <div class="flex gap-2">
+            <button type="button" onclick="closeEditModal()" class="px-4 py-2 rounded-lg text-sm font-medium text-slate-600 hover:bg-slate-100 transition">Cancel</button>
+            <button type="submit" class="px-4 py-2 rounded-lg text-sm font-medium bg-forest-600 hover:bg-forest-700 text-white transition">Save Changes</button>
+          </div>
         </div>
       </form>
     </div>
@@ -151,24 +181,33 @@
 
   <!-- Application Logic JavaScript -->
   <script>
-    // Registry Data State
-    let registryData = {
+    // State Initialization with localStorage Persistence
+    let registryData = loadState() || {
       userName: "",
       venmoHandle: "",
       currentSort: "default",
       items: []
     };
 
+    // View Mode State: 'owner' or 'buyer'
+    let currentViewMode = 'owner';
+
     // DOM Elements
     const itemListEl = document.getElementById('itemList');
     const addItemForm = document.getElementById('addItemForm');
     const venmoDisplay = document.getElementById('venmoDisplay');
     const registryTitle = document.getElementById('registryTitle');
+    const registrySubtext = document.getElementById('registrySubtext');
     const submitBtn = document.getElementById('submitBtn');
     const editModal = document.getElementById('editModal');
     const editItemForm = document.getElementById('editItemForm');
+    
+    const modeBadge = document.getElementById('modeBadge');
+    const toggleViewBtn = document.getElementById('toggleViewBtn');
+    const creatorProfileSection = document.getElementById('creatorProfileSection');
+    const creatorAddItemSection = document.getElementById('creatorAddItemSection');
 
-    // Number Formatter (with commas, no USD label)
+    // Currency Formatter
     const currencyFormatter = new Intl.NumberFormat('en-US', {
       style: 'currency',
       currency: 'USD',
@@ -178,7 +217,7 @@
       return currencyFormatter.format(amount);
     }
 
-    // Ensures URL has an HTTP/HTTPS protocol for clickable anchor links
+    // URL Protocol Normalizer
     function normalizeUrl(urlString) {
       const trimmed = urlString.trim();
       if (!/^https?:\/\//i.test(trimmed)) {
@@ -187,14 +226,93 @@
       return trimmed;
     }
 
+    // Local Storage Helpers
+    function saveState() {
+      localStorage.setItem('regisTree_data', JSON.stringify(registryData));
+    }
+
+    function loadState() {
+      const saved = localStorage.getItem('regisTree_data');
+      return saved ? JSON.parse(saved) : null;
+    }
+
+    // View Mode Routing & Initialization
+    function detectViewMode() {
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.get('view') === 'buyer' || window.location.hash === '#buyer') {
+        currentViewMode = 'buyer';
+      } else {
+        currentViewMode = 'owner';
+      }
+      applyViewModeUI();
+    }
+
+    function toggleViewMode() {
+      if (currentViewMode === 'owner') {
+        currentViewMode = 'buyer';
+        window.history.replaceState(null, '', '?view=buyer');
+      } else {
+        currentViewMode = 'owner';
+        window.history.replaceState(null, '', window.location.pathname);
+      }
+      applyViewModeUI();
+      renderRegistry();
+    }
+
+    function applyViewModeUI() {
+      if (currentViewMode === 'buyer') {
+        modeBadge.classList.add('hidden');
+        toggleViewBtn.classList.add('hidden');
+        
+        creatorProfileSection.classList.add('hidden');
+        creatorAddItemSection.classList.add('hidden');
+
+        registrySubtext.textContent = 'Choose an item to gift via Venmo. Your payment goes directly to the recipient.';
+      } else {
+        modeBadge.textContent = 'Owner View';
+        modeBadge.className = 'text-xs bg-forest-100 text-forest-700 px-3 py-1 rounded-full font-medium';
+        modeBadge.classList.remove('hidden');
+
+        toggleViewBtn.textContent = 'Show Registry';
+        toggleViewBtn.classList.remove('hidden');
+
+        creatorProfileSection.classList.remove('hidden');
+        creatorAddItemSection.classList.remove('hidden');
+
+        registrySubtext.textContent = 'Directly fund items to cut out shipping delays and packaging waste.';
+      }
+    }
+
+    // Share Registry Link Action
+    function shareRegistry() {
+      const shareUrl = `${window.location.origin}${window.location.pathname}?view=buyer`;
+      navigator.clipboard.writeText(shareUrl).then(() => {
+        showToast("Shareable buyer link copied to clipboard!");
+      }).catch(() => {
+        prompt("Copy your shareable registry link:", shareUrl);
+      });
+    }
+
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      document.getElementById('toastMsg').textContent = msg;
+      toast.classList.remove('opacity-0', 'pointer-events-none', 'translate-y-[-20px]');
+      toast.classList.add('opacity-100', 'translate-y-0');
+
+      setTimeout(() => {
+        toast.classList.remove('opacity-100', 'translate-y-0');
+        toast.classList.add('opacity-0', 'pointer-events-none', 'translate-y-[-20px]');
+      }, 3000);
+    }
+
     // Update Recipient Name
     function updateUserName() {
       const input = document.getElementById('userNameInput').value.trim();
       if (!input) return;
       
       registryData.userName = input;
-      const ending = input.endsWith('s') || input.endsWith('S') ? "'s" : "'s";
-      registryTitle.textContent = `${registryData.userName}${ending} regisTree`;
+      saveState();
+      updateTitleDisplay();
     }
 
     // Update Venmo Handle
@@ -203,13 +321,23 @@
       if (!input) return;
 
       registryData.venmoHandle = input;
-      venmoDisplay.textContent = `@${registryData.venmoHandle}`;
+      saveState();
       renderRegistry();
+    }
+
+    function updateTitleDisplay() {
+      if (registryData.userName) {
+        const ending = registryData.userName.endsWith('s') || registryData.userName.endsWith('S') ? "'s" : "'s";
+        registryTitle.textContent = `${registryData.userName}${ending} regisTree`;
+      } else {
+        registryTitle.textContent = 'My regisTree';
+      }
     }
 
     // Change Sorting Option
     function changeSort(sortOption) {
       registryData.currentSort = sortOption;
+      saveState();
       renderRegistry();
     }
 
@@ -264,10 +392,22 @@
       }
     }
 
-    // Render Registry Items
+    // Main Render Loop
     function renderRegistry() {
       itemListEl.innerHTML = '';
+      updateTitleDisplay();
+      
       venmoDisplay.textContent = registryData.venmoHandle ? `@${registryData.venmoHandle}` : 'Not set';
+
+      if (registryData.userName && document.getElementById('userNameInput')) {
+        document.getElementById('userNameInput').value = registryData.userName;
+      }
+      if (registryData.venmoHandle && document.getElementById('venmoHandleInput')) {
+        document.getElementById('venmoHandleInput').value = registryData.venmoHandle;
+      }
+      if (document.getElementById('sortSelect')) {
+        document.getElementById('sortSelect').value = registryData.currentSort || 'default';
+      }
 
       const visibleItems = getSortedItems();
 
@@ -276,7 +416,7 @@
           <div class="bg-white p-12 rounded-2xl text-center text-slate-400 border border-slate-100">
             <svg class="w-12 h-12 mx-auto text-slate-300 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"/></svg>
             <p class="font-medium text-slate-600">Your registry is currently empty</p>
-            <p class="text-xs text-slate-400 mt-1">Paste a product URL above to add your first item.</p>
+            <p class="text-xs text-slate-400 mt-1">${currentViewMode === 'owner' ? 'Paste a product URL above to add your first item.' : 'Check back later for newly added items.'}</p>
           </div>`;
         return;
       }
@@ -288,6 +428,8 @@
         const venmoHandle = registryData.venmoHandle || "recipient";
         const venmoNote = encodeURIComponent(`Gift for ${item.name} via regisTree`);
         const venmoUrl = `https://venmo.com/${venmoHandle}?txn=pay&amount=${item.price.toFixed(2)}&note=${venmoNote}`;
+
+        const isOwner = currentViewMode === 'owner';
 
         itemCard.innerHTML = `
           <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -307,9 +449,14 @@
             </div>
 
             <div class="flex items-center gap-2 flex-shrink-0">
-              <button onclick="openEditModal('${item.id}')" class="p-2 text-slate-400 hover:text-slate-600 rounded-lg hover:bg-slate-100 transition flex-shrink-0" title="Edit item details">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
-              </button>
+              ${isOwner ? `
+                <button onclick="openEditModal('${item.id}')" class="p-2 text-slate-400 hover:text-slate-600 rounded-lg hover:bg-slate-100 transition flex-shrink-0" title="Edit item details">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                </button>
+                <button onclick="deleteRegistryItem('${item.id}')" class="p-2 text-slate-400 hover:text-red-600 rounded-lg hover:bg-red-50 transition flex-shrink-0" title="Delete item">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                </button>
+              ` : ''}
               
               ${!item.funded ? `
                 <a href="${venmoUrl}" target="_blank" onclick="markAsFunded('${item.id}')" class="w-44 text-center bg-forest-600 hover:bg-forest-700 text-white font-medium px-4 py-2.5 rounded-xl transition text-sm flex items-center justify-center gap-2 whitespace-nowrap shrink-0">
@@ -331,7 +478,7 @@
       });
     }
 
-    // Add Item Form Handler
+    // Add Item Form Handler (Owner Only)
     addItemForm.addEventListener('submit', (e) => {
       e.preventDefault();
       const urlInput = document.getElementById('itemUrl');
@@ -354,6 +501,7 @@
         };
 
         registryData.items.unshift(newItem);
+        saveState();
         renderRegistry();
         
         urlInput.value = '';
@@ -364,8 +512,28 @@
       }, 300);
     });
 
-    // Edit Modal Logic
+    // Delete Item Actions (Owner Only)
+    function deleteRegistryItem(id) {
+      if (currentViewMode !== 'owner') return;
+
+      const item = registryData.items.find(i => i.id === id);
+      if (item && confirm(`Are you sure you want to delete "${item.name}" from your registry?`)) {
+        registryData.items = registryData.items.filter(i => i.id !== id);
+        saveState();
+        renderRegistry();
+      }
+    }
+
+    function deleteModalItem() {
+      const id = document.getElementById('editItemId').value;
+      closeEditModal();
+      deleteRegistryItem(id);
+    }
+
+    // Edit Modal Logic (Owner Only)
     function openEditModal(id) {
+      if (currentViewMode !== 'owner') return;
+
       const item = registryData.items.find(i => i.id === id);
       if (!item) return;
 
@@ -390,6 +558,7 @@
         item.name = document.getElementById('editItemName').value.trim();
         item.price = parseFloat(document.getElementById('editItemPrice').value) || 0;
         item.url = normalizeUrl(document.getElementById('editItemUrl').value);
+        saveState();
         renderRegistry();
       }
 
@@ -400,9 +569,10 @@
     function markAsFunded(id) {
       const item = registryData.items.find(i => i.id === id);
       if (item && !item.funded) {
-        const gifterName = prompt("Enter your name to mark this item as gifted:", "A Friend");
+        const gifterName = prompt("Enter your name so the recipient knows who gifted this item:", "A Friend");
         item.funded = true;
         item.fundedBy = gifterName || "Anonymous";
+        saveState();
         setTimeout(renderRegistry, 300);
       }
     }
@@ -413,18 +583,20 @@
       if (item && item.funded) {
         item.funded = false;
         item.fundedBy = null;
+        saveState();
         renderRegistry();
       }
     }
 
-    // Helper to Escape Special Characters
+    // Utility: Escape Special Characters
     function escapeHtml(str) {
       return str.replace(/[&<>"']/g, function(m) {
         return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[m];
       });
     }
 
-    // Initial Render
+    // Initial Execution
+    detectViewMode();
     renderRegistry();
   </script>
 </body>
