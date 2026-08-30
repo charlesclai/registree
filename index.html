@@ -65,7 +65,7 @@
     </div>
 
     <!-- regisTree Banner & Header Info -->
-    <section class="bg-white rounded-2xl p-6 shadow-sm border border-forest-100 mb-8 space-y-6">
+    <section id="registryMainSection" class="bg-white rounded-2xl p-6 shadow-sm border border-forest-100 mb-8 space-y-6">
       <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-100 pb-6">
         <div>
           <h1 class="text-2xl font-bold text-slate-900" id="registryTitle">My regisTree</h1>
@@ -140,7 +140,7 @@
     </section>
 
     <!-- Wishlist Container -->
-    <section>
+    <section id="wishlistSection">
       <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
         <div>
           <h2 class="text-lg font-semibold text-slate-900">regisTree Items</h2>
@@ -163,6 +163,41 @@
         <!-- Dynamic items render here -->
       </div>
     </section>
+
+    <!-- ALWAYS AVAILABLE: FIND BY VENMO ID SEARCH BOX (MOVED TO BOTTOM) -->
+    <section id="venmoSearchSection" class="bg-white rounded-2xl p-6 shadow-sm border border-forest-100 my-8">
+      <h2 class="text-lg font-semibold text-slate-900 mb-1">Find a regisTree</h2>
+      <p class="text-slate-500 text-xs mb-4">Search for friend or family member registries using their Venmo handle.</p>
+      
+      <form id="searchVenmoForm" class="space-y-3">
+        <div class="flex flex-col sm:flex-row gap-2">
+          <div class="relative flex-grow">
+            <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-400 font-mono text-sm">@</span>
+            <input type="text" id="searchVenmoInput" required placeholder="VenmoHandle (e.g. Charles)" class="w-full pl-7 pr-4 py-2.5 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-forest-600 text-sm" />
+          </div>
+          <button type="submit" id="searchVenmoBtn" class="bg-forest-600 hover:bg-forest-700 text-white font-medium px-6 py-2.5 rounded-lg transition text-sm flex items-center justify-center gap-2 whitespace-nowrap">
+            <span>Search Registries</span>
+          </button>
+        </div>
+        <p id="searchError" class="text-xs text-red-600 hidden font-medium">No registries found matching that Venmo handle.</p>
+      </form>
+
+      <!-- Search Results Container (Lists ALL matching registries) -->
+      <div id="searchResultsContainer" class="mt-4 space-y-2 hidden">
+        <h4 class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Matching Registries Found:</h4>
+        <div id="searchResultsList" class="space-y-2">
+          <!-- Dynamic search results render here -->
+        </div>
+      </div>
+    </section>
+
+    <!-- Google AdSense Native Ad Placeholder Container -->
+    <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-100 mt-8 text-center">
+      <p class="text-[10px] text-slate-400 uppercase tracking-wider mb-2">Sponsored</p>
+      <div class="py-6 bg-slate-50 border border-dashed border-slate-200 rounded-xl text-slate-400 text-xs">
+        Google AdSense Ad Slot (Active after AdSense Approval)
+      </div>
+    </div>
 
   </main>
 
@@ -387,6 +422,8 @@
     const authNavContainer = document.getElementById('authNavContainer');
     const creatorProfileSection = document.getElementById('creatorProfileSection');
     const creatorAddItemSection = document.getElementById('creatorAddItemSection');
+    const registryMainSection = document.getElementById('registryMainSection');
+    const wishlistSection = document.getElementById('wishlistSection');
 
     // Currency Formatter
     const currencyFormatter = new Intl.NumberFormat('en-US', {
@@ -446,6 +483,9 @@
       activeRegistryId = urlParams.get('id');
 
       if (activeRegistryId) {
+        registryMainSection.classList.remove('hidden');
+        wishlistSection.classList.remove('hidden');
+
         try {
           const { data, error } = await supabaseClient
             .from('registries')
@@ -470,6 +510,8 @@
           resetRegistryData();
         }
       } else {
+        registryMainSection.classList.add('hidden');
+        wishlistSection.classList.add('hidden');
         resetRegistryData();
       }
 
@@ -488,6 +530,63 @@
         openAuthModal('signup');
       }
     }
+
+    // Search by Venmo ID Handle Event Listener (Displays ALL matching lists)
+    document.getElementById('searchVenmoForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const searchError = document.getElementById('searchError');
+      const searchVenmoBtn = document.getElementById('searchVenmoBtn');
+      const searchResultsContainer = document.getElementById('searchResultsContainer');
+      const searchResultsList = document.getElementById('searchResultsList');
+      
+      searchError.classList.add('hidden');
+      searchResultsContainer.classList.add('hidden');
+      searchResultsList.innerHTML = '';
+
+      let queryVenmo = document.getElementById('searchVenmoInput').value.trim().replace(/^@/, '');
+      if (!queryVenmo) return;
+
+      searchVenmoBtn.disabled = true;
+      searchVenmoBtn.textContent = 'Searching...';
+
+      try {
+        const { data, error } = await supabaseClient
+          .from('registries')
+          .select('id, user_name, venmo_handle, items')
+          .ilike('venmo_handle', queryVenmo);
+
+        if (data && data.length > 0 && !error) {
+          data.forEach(reg => {
+            const resultCard = document.createElement('div');
+            resultCard.className = 'flex items-center justify-between bg-slate-50 border border-slate-200 p-3 rounded-xl hover:bg-forest-50 transition cursor-pointer';
+            resultCard.onclick = () => {
+              window.location.href = `${window.location.pathname}?id=${reg.id}`;
+            };
+
+            resultCard.innerHTML = `
+              <div>
+                <span class="font-bold text-slate-800 text-sm block">${escapeHtml(reg.user_name || 'Unnamed')}’s regisTree</span>
+                <span class="font-mono text-xs text-forest-600">@${escapeHtml(reg.venmo_handle)} &bull; ${reg.items ? reg.items.length : 0} items</span>
+              </div>
+              <span class="text-xs bg-forest-600 text-white font-medium px-3 py-1.5 rounded-lg">View Registry &rarr;</span>
+            `;
+            searchResultsList.appendChild(resultCard);
+          });
+
+          searchResultsContainer.classList.remove('hidden');
+        } else {
+          searchError.classList.remove('hidden');
+        }
+
+        searchVenmoBtn.disabled = false;
+        searchVenmoBtn.textContent = 'Search Registries';
+      } catch (err) {
+        console.error("Venmo search error:", err);
+        searchError.classList.remove('hidden');
+        searchVenmoBtn.disabled = false;
+        searchVenmoBtn.textContent = 'Search Registries';
+      }
+    });
 
     // Save Registry State to Supabase
     async function saveState() {
@@ -550,23 +649,7 @@
       const passcode = document.getElementById('signUpPasscode').value.trim();
 
       signUpSubmitBtn.disabled = true;
-      signUpSubmitBtn.textContent = 'Checking...';
-
-      try {
-        const { data } = await supabaseClient
-          .from('registries')
-          .select('id')
-          .eq('user_email', email);
-
-        if (data && data.length > 0) {
-          signUpError.classList.remove('hidden');
-          signUpSubmitBtn.disabled = false;
-          signUpSubmitBtn.textContent = 'Create Account';
-          return;
-        }
-      } catch (err) {
-        console.error("Pre-check error:", err);
-      }
+      signUpSubmitBtn.textContent = 'Creating...';
 
       const randomSlug = generateRandomSlug();
       const newRegistryId = `registree-${randomSlug}`;
@@ -590,6 +673,7 @@
           ]);
 
         if (insertErr) {
+          signUpError.textContent = "Error creating account. Email or Venmo handle may already be in use.";
           signUpError.classList.remove('hidden');
           signUpSubmitBtn.disabled = false;
           signUpSubmitBtn.textContent = 'Create Account';
@@ -617,10 +701,13 @@
 
         closeAuthModal();
         applyViewModeUI();
+        registryMainSection.classList.remove('hidden');
+        wishlistSection.classList.remove('hidden');
         renderRegistry();
         showToast("Account created! Add items below to populate your registry.");
       } catch (err) {
         console.error("Account creation error:", err);
+        signUpError.textContent = "An error occurred. Please try again.";
         signUpError.classList.remove('hidden');
         signUpSubmitBtn.disabled = false;
         signUpSubmitBtn.textContent = 'Create Account';
@@ -681,6 +768,8 @@
 
             closeAuthModal();
             applyViewModeUI();
+            registryMainSection.classList.remove('hidden');
+            wishlistSection.classList.remove('hidden');
             renderRegistry();
             showToast("Logged in as Owner!");
             return;
@@ -737,7 +826,6 @@
     }
 
     async function promptPasswordResetEmail(targetEmail) {
-      // Re-added the confirmation dialog prompt before executing the send action
       if (confirm(`Would you like your passcode sent to ${targetEmail}?`)) {
         try {
           const { data, error } = await supabaseClient
@@ -772,13 +860,7 @@
 
     // Navigation Controllers
     function handleHeaderTitleClick() {
-      if (activeRegistryId) {
-        currentViewMode = 'buyer';
-        applyViewModeUI();
-        renderRegistry();
-      } else {
-        openAuthModal('signup');
-      }
+      window.location.href = window.location.pathname;
     }
 
     function toggleOwnerEditView() {
@@ -794,14 +876,6 @@
       applyViewModeUI();
       renderRegistry();
       showToast("Logged out of Owner View.");
-    }
-
-    function createNewRegistry() {
-      activeRegistryId = null;
-      window.history.replaceState(null, '', window.location.pathname);
-      resetRegistryData();
-      renderRegistry();
-      openAuthModal('signup');
     }
 
     function applyViewModeUI() {
@@ -823,7 +897,7 @@
             <button onclick="logoutOwner()" class="text-xs text-slate-400 hover:text-red-600 underline">Log Out</button>`;
         } else {
           authNavContainer.innerHTML = `
-            <button onclick="createNewRegistry()" class="text-xs font-semibold text-forest-600 hover:text-forest-800 underline">Create My Own regisTree</button>
+            <button onclick="openAuthModal('signup')" class="text-xs font-semibold text-forest-600 hover:text-forest-800 underline">Create regisTree</button>
             <span class="text-slate-300">|</span>
             <button onclick="openAuthModal('login')" class="text-xs text-slate-500 hover:text-slate-700 underline">Owner Login</button>`;
         }
@@ -967,6 +1041,8 @@
 
     // Main Render Function
     function renderRegistry() {
+      if (!activeRegistryId) return;
+
       itemListEl.innerHTML = '';
       updateTitleDisplay();
       
