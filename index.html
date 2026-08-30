@@ -747,13 +747,19 @@
           if (data && data.length > 0 && !error) {
             const userRecord = data[0];
 
-            await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
-              to_name: userRecord.user_name || 'User',
-              to_email: targetEmail,
-              passcode: userRecord.passcode
-            });
-            showToast(`Passcode email sent to ${targetEmail}`);
+            // Send actual email via EmailJS with the correctly mapped {{email}} variable
+            if (typeof emailjs !== 'undefined') {
+              await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
+                to_name: userRecord.user_name || 'User',
+                email: targetEmail, 
+                passcode: userRecord.passcode
+              });
+              showToast(`Passcode email sent to ${targetEmail}`);
+            } else {
+              showToast("EmailJS is not configured properly.");
+            }
 
+            // Unlocks the account so the user can log in after checking their email
             await supabaseClient.from('registries').update({
               failed_attempts: 0,
               is_locked: false
