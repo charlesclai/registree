@@ -50,7 +50,7 @@
       
       <!-- Action Controls -->
       <div class="flex items-center gap-3">
-        <span id="modeBadge" class="text-xs bg-forest-100 text-forest-700 px-3 py-1 rounded-full font-medium hidden">
+        <span id="modeBadge" class="text-xs bg-forest-100 text-forest-700 px-3 py-1 rounded-full font-medium text-center hidden">
           Owner View
         </span>
         <div id="authNavContainer" class="flex items-center gap-2">
@@ -98,6 +98,19 @@
           <div>
             <label for="userEmailInput" class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1">Account Email</label>
             <input type="email" id="userEmailInput" disabled class="w-full px-3 py-2 rounded-lg border border-slate-100 bg-slate-50 text-slate-500 text-sm cursor-not-allowed" />
+          </div>
+
+          <div>
+            <label for="newPasswordInput" class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1">New Password</label>
+            <div class="relative">
+              <input type="password" id="newPasswordInput" placeholder="Leave blank to keep current" class="w-full px-3 py-2 pr-10 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-forest-600 text-sm" />
+              <button type="button" onclick="togglePasswordVisibility('newPasswordInput', 'eyeIconNewPassword')" class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600">
+                <svg id="eyeIconNewPassword" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                </svg>
+              </button>
+            </div>
           </div>
         </div>
 
@@ -825,7 +838,7 @@
         registrySubtext.textContent = 'Buy the gifts they actually want. Directly fund items to cut out shipping coordination issues and to reduce packaging waste.';
       } else {
         modeBadge.textContent = 'Owner View';
-        modeBadge.className = 'text-xs bg-forest-100 text-forest-700 px-3 py-1 rounded-full font-medium';
+        modeBadge.className = 'text-xs bg-forest-100 text-forest-700 px-3 py-1 rounded-full font-medium text-center';
         modeBadge.classList.remove('hidden');
 
         authNavContainer.innerHTML = `
@@ -839,16 +852,31 @@
       }
     }
 
-    function saveProfileSettings() {
+    async function saveProfileSettings() {
       const nameInput = document.getElementById('userNameInput').value.trim();
       const venmoInput = document.getElementById('venmoHandleInput').value.trim().replace(/^@/, '');
+      const newPasswordInput = document.getElementById('newPasswordInput').value.trim();
 
       if (nameInput) registryData.userName = nameInput;
       if (venmoInput) registryData.venmoHandle = venmoInput;
 
-      saveState();
+      if (newPasswordInput) {
+        try {
+          const { error: updateAuthErr } = await supabaseClient.auth.updateUser({
+            password: newPasswordInput
+          });
+          if (updateAuthErr) throw updateAuthErr;
+          document.getElementById('newPasswordInput').value = '';
+        } catch (err) {
+          console.error("Password update error:", err);
+          showToast("Failed to update password: " + err.message);
+          return;
+        }
+      }
+
+      await saveState();
       renderRegistry();
-      showToast("Account profile settings saved!");
+      showToast(newPasswordInput ? "Profile and password updated successfully!" : "Account profile settings saved!");
     }
 
     function shareRegistry() {
