@@ -99,19 +99,6 @@
             <label for="userEmailInput" class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1">Account Email</label>
             <input type="email" id="userEmailInput" disabled class="w-full px-3 py-2 rounded-lg border border-slate-100 bg-slate-50 text-slate-500 text-sm cursor-not-allowed" />
           </div>
-
-          <div>
-            <label for="ownerPasscodeInput" class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1">Account Passcode</label>
-            <div class="relative">
-              <input type="password" id="ownerPasscodeInput" placeholder="Update passcode" class="w-full px-3 py-2 pr-10 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-forest-600 text-sm" />
-              <button type="button" onclick="togglePasswordVisibility('ownerPasscodeInput', 'eyeIconProfile')" class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600">
-                <svg id="eyeIconProfile" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                </svg>
-              </button>
-            </div>
-          </div>
         </div>
 
         <div class="pt-3 border-t border-slate-50 flex justify-between items-center">
@@ -266,7 +253,7 @@
       <div id="signUpViewContainer">
         <div class="text-center mb-4">
           <h3 class="text-lg font-semibold text-slate-900">Create Your regisTree</h3>
-          <p class="text-xs text-slate-500 mt-1">Set up your account to start building and sharing your wishlist.</p>
+          <p class="text-xs text-slate-500 mt-1">Set up your secure account to start building and sharing your wishlist.</p>
         </div>
 
         <form id="signUpForm" class="space-y-3">
@@ -286,9 +273,9 @@
           </div>
 
           <div>
-            <label class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1">Create Passcode</label>
+            <label class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1">Password</label>
             <div class="relative">
-              <input type="password" id="signUpPasscode" required placeholder="Create passcode" class="w-full px-3 py-2 pr-10 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-forest-600 text-sm" />
+              <input type="password" id="signUpPasscode" required placeholder="Create secure password" class="w-full px-3 py-2 pr-10 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-forest-600 text-sm" />
               <button type="button" onclick="togglePasswordVisibility('signUpPasscode', 'eyeIconSignUp')" class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600">
                 <svg id="eyeIconSignUp" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -298,7 +285,7 @@
             </div>
           </div>
 
-          <p id="signUpError" class="text-xs text-red-600 hidden font-medium text-center">An account with this email address already exists. Please log in instead.</p>
+          <p id="signUpError" class="text-xs text-red-600 hidden font-medium text-center"></p>
 
           <div class="flex gap-2 pt-2">
             <button type="button" id="signUpCancelBtn" onclick="closeAuthModal()" class="w-full py-2.5 rounded-xl text-sm font-medium text-slate-600 hover:bg-slate-100 transition">Cancel</button>
@@ -316,7 +303,7 @@
       <div id="loginViewContainer" class="hidden">
         <div class="text-center mb-4">
           <h3 class="text-lg font-semibold text-slate-900">Owner Login</h3>
-          <p class="text-xs text-slate-500 mt-1">Enter your account email and passcode to manage your regisTree.</p>
+          <p class="text-xs text-slate-500 mt-1">Enter your account credentials to manage your regisTree.</p>
         </div>
 
         <form id="loginForm" class="space-y-3">
@@ -326,12 +313,9 @@
           </div>
 
           <div>
-            <div class="flex justify-between items-center mb-1">
-              <label class="block text-xs font-semibold text-slate-600 uppercase tracking-wider">Passcode</label>
-              <button type="button" onclick="handleForgotPassword()" class="text-xs font-semibold text-forest-600 hover:underline">Forgot passcode?</button>
-            </div>
+            <label class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1">Password</label>
             <div class="relative">
-              <input type="password" id="loginPasscode" required placeholder="Enter passcode" class="w-full px-3 py-2 pr-10 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-forest-600 text-sm" />
+              <input type="password" id="loginPasscode" required placeholder="Enter password" class="w-full px-3 py-2 pr-10 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-forest-600 text-sm" />
               <button type="button" onclick="togglePasswordVisibility('loginPasscode', 'eyeIconLogin')" class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600">
                 <svg id="eyeIconLogin" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -394,7 +378,7 @@
     </div>
   </div>
 
-  <!-- Application Logic JavaScript -->
+  <!-- Application Logic JavaScript (Updated with Supabase Auth) -->
   <script>
     // Supabase Credentials
     const SUPABASE_URL = 'https://kzifhsejyezhkmpeyexh.supabase.co';
@@ -420,7 +404,6 @@
       userName: "",
       userEmail: "",
       venmoHandle: "",
-      passcode: "",
       currentFilter: "all",
       currentSort: "default",
       items: []
@@ -501,7 +484,6 @@
         userName: "",
         userEmail: "",
         venmoHandle: "",
-        passcode: "",
         currentFilter: "all",
         currentSort: "default",
         items: []
@@ -520,7 +502,7 @@
         try {
           const { data, error } = await supabaseClient
             .from('registries')
-            .select('id, user_name, user_email, venmo_handle, passcode, current_filter, current_sort, items')
+            .select('id, user_name, user_email, venmo_handle, current_sort, items')
             .eq('id', activeRegistryId);
 
           if (data && data.length > 0 && !error) {
@@ -529,8 +511,7 @@
               userName: match.user_name || "",
               userEmail: match.user_email || "",
               venmoHandle: match.venmo_handle || "",
-              passcode: match.passcode || "",
-              currentFilter: match.current_filter || "all",
+              currentFilter: "all",
               currentSort: match.current_sort || "default",
               items: match.items || []
             };
@@ -547,8 +528,9 @@
         resetRegistryData();
       }
 
-      const localOwnerEmail = localStorage.getItem('regisTree_owner_email');
-      if (localOwnerEmail && registryData.userEmail && localOwnerEmail.toLowerCase().trim() === registryData.userEmail.toLowerCase().trim()) {
+      // Check active Supabase Auth session
+      const { data: { session } } = await supabaseClient.auth.getSession();
+      if (session && session.user && registryData.userEmail && session.user.email.toLowerCase().trim() === registryData.userEmail.toLowerCase().trim()) {
         isOwnerLoggedIn = true;
       } else {
         isOwnerLoggedIn = false;
@@ -626,8 +608,6 @@
           user_name: registryData.userName,
           user_email: registryData.userEmail.toLowerCase().trim(),
           venmo_handle: registryData.venmoHandle,
-          passcode: String(registryData.passcode).trim(),
-          current_filter: registryData.currentFilter,
           current_sort: registryData.currentSort,
           items: registryData.items,
           updated_at: new Date()
@@ -665,7 +645,7 @@
       signUpViewContainer.classList.remove('hidden');
     }
 
-    // Handle Create Account
+    // Handle Create Account (Supabase Auth SignUp)
     document.getElementById('signUpForm').addEventListener('submit', async (e) => {
       e.preventDefault();
       signUpError.classList.add('hidden');
@@ -678,48 +658,47 @@
       signUpSubmitBtn.disabled = true;
       signUpSubmitBtn.textContent = 'Creating...';
 
-      const randomSlug = generateRandomSlug();
-      const newRegistryId = `registree-${randomSlug}`;
-
       try {
+        const { data: authData, error: authErr } = await supabaseClient.auth.signUp({
+          email: email,
+          password: passcode,
+          options: {
+            data: { user_name: name, venmo_handle: venmo }
+          }
+        });
+
+        if (authErr) throw authErr;
+
+        const userId = authData.user.id;
+        const newRegistryId = `registree-${userId.substring(0, 8)}`;
+
         const { error: insertErr } = await supabaseClient
           .from('registries')
           .insert([
             {
               id: newRegistryId,
+              user_id: userId,
               user_name: name,
               user_email: email,
               venmo_handle: venmo,
-              passcode: passcode,
-              current_filter: 'all',
               current_sort: 'default',
               items: [],
-              failed_attempts: 0,
-              is_locked: false,
               updated_at: new Date()
             }
           ]);
 
-        if (insertErr) {
-          signUpError.textContent = "Error creating account. Email or Venmo handle may already be in use.";
-          signUpError.classList.remove('hidden');
-          signUpSubmitBtn.disabled = false;
-          signUpSubmitBtn.textContent = 'Create Account';
-          return;
-        }
+        if (insertErr) throw insertErr;
 
         activeRegistryId = newRegistryId;
         registryData = {
           userName: name,
           userEmail: email,
           venmoHandle: venmo,
-          passcode: passcode,
           currentFilter: 'all',
           currentSort: 'default',
           items: []
         };
 
-        localStorage.setItem('regisTree_owner_email', email);
         isOwnerLoggedIn = true;
         currentViewMode = 'owner';
 
@@ -733,17 +712,17 @@
         registryMainSection.classList.remove('hidden');
         wishlistSection.classList.remove('hidden');
         renderRegistry();
-        showToast("Account created! Add items below to populate your registry.");
+        showToast("Account created securely!");
       } catch (err) {
         console.error("Account creation error:", err);
-        signUpError.textContent = "An error occurred. Please try again.";
+        signUpError.textContent = err.message || "An error occurred. Please try again.";
         signUpError.classList.remove('hidden');
         signUpSubmitBtn.disabled = false;
         signUpSubmitBtn.textContent = 'Create Account';
       }
     });
 
-    // Handle Owner Login with 5-Attempt Lockout Mechanism
+    // Handle Owner Login (Supabase Auth SignIn)
     document.getElementById('loginForm').addEventListener('submit', async (e) => {
       e.preventDefault();
       loginError.classList.add('hidden');
@@ -754,139 +733,56 @@
       const enteredPasscode = document.getElementById('loginPasscode').value.trim();
 
       try {
+        const { data: authData, error: authErr } = await supabaseClient.auth.signInWithPassword({
+          email: enteredEmail,
+          password: enteredPasscode
+        });
+
+        if (authErr) throw authErr;
+
         const { data, error } = await supabaseClient
           .from('registries')
-          .select('id, user_name, user_email, venmo_handle, passcode, current_filter, current_sort, items, failed_attempts, is_locked')
+          .select('id, user_name, user_email, venmo_handle, current_sort, items')
           .eq('user_email', enteredEmail);
 
         if (data && data.length > 0 && !error) {
           const userAccount = data[0];
 
-          if (userAccount.is_locked || (userAccount.failed_attempts || 0) >= 5) {
-            await supabaseClient.from('registries').update({ is_locked: true }).eq('id', userAccount.id);
-            
-            loginError.textContent = "Account locked due to 5 failed attempts. Please request passcode recovery below.";
-            loginError.classList.remove('hidden');
-            loginSubmitBtn.disabled = false;
-            loginSubmitBtn.textContent = 'Log In';
-            promptPasswordResetEmail(userAccount.user_email);
-            return;
-          }
+          activeRegistryId = userAccount.id;
+          registryData = {
+            userName: userAccount.user_name || "",
+            userEmail: userAccount.user_email || "",
+            venmoHandle: userAccount.venmo_handle || "",
+            currentFilter: "all",
+            currentSort: userAccount.current_sort || "default",
+            items: userAccount.items || []
+          };
 
-          if (String(userAccount.passcode).trim() === enteredPasscode) {
-            await supabaseClient.from('registries').update({ failed_attempts: 0, is_locked: false }).eq('id', userAccount.id);
+          isOwnerLoggedIn = true;
+          currentViewMode = 'owner';
 
-            activeRegistryId = userAccount.id;
-            registryData = {
-              userName: userAccount.user_name || "",
-              userEmail: userAccount.user_email || "",
-              venmoHandle: userAccount.venmo_handle || "",
-              passcode: userAccount.passcode || "",
-              currentFilter: userAccount.current_filter || "all",
-              currentSort: userAccount.current_sort || "default",
-              items: userAccount.items || []
-            };
+          window.history.replaceState(null, '', `?id=${activeRegistryId}`);
 
-            localStorage.setItem('regisTree_owner_email', enteredEmail);
-            isOwnerLoggedIn = true;
-            currentViewMode = 'owner';
+          loginSubmitBtn.disabled = false;
+          loginSubmitBtn.textContent = 'Log In';
 
-            window.history.replaceState(null, '', `?id=${activeRegistryId}`);
-
-            loginSubmitBtn.disabled = false;
-            loginSubmitBtn.textContent = 'Log In';
-
-            closeAuthModal();
-            applyViewModeUI();
-            registryMainSection.classList.remove('hidden');
-            wishlistSection.classList.remove('hidden');
-            renderRegistry();
-            showToast("Logged in as Owner!");
-            return;
-          } else {
-            const newFailedCount = (userAccount.failed_attempts || 0) + 1;
-            const willLock = newFailedCount >= 5;
-
-            await supabaseClient.from('registries').update({
-              failed_attempts: newFailedCount,
-              is_locked: willLock
-            }).eq('id', userAccount.id);
-
-            if (willLock) {
-              loginError.textContent = "Account locked due to 5 failed attempts. Please request passcode recovery below.";
-              loginError.classList.remove('hidden');
-              promptPasswordResetEmail(userAccount.user_email);
-            } else {
-              const remaining = 5 - newFailedCount;
-              loginError.textContent = `Invalid passcode. ${remaining} attempt${remaining === 1 ? '' : 's'} remaining before account lockout.`;
-              loginError.classList.remove('hidden');
-            }
-
-            loginSubmitBtn.disabled = false;
-            loginSubmitBtn.textContent = 'Log In';
-            return;
-          }
+          closeAuthModal();
+          applyViewModeUI();
+          registryMainSection.classList.remove('hidden');
+          wishlistSection.classList.remove('hidden');
+          renderRegistry();
+          showToast("Logged in securely as Owner!");
+        } else {
+          throw new Error("Registry record not found for this account.");
         }
-
-        loginError.textContent = "Invalid email or passcode.";
-        loginError.classList.remove('hidden');
-        loginSubmitBtn.disabled = false;
-        loginSubmitBtn.textContent = 'Log In';
       } catch (err) {
         console.error("Login Error:", err);
-        loginError.textContent = "Invalid email or passcode.";
+        loginError.textContent = "Invalid email or password.";
         loginError.classList.remove('hidden');
         loginSubmitBtn.disabled = false;
         loginSubmitBtn.textContent = 'Log In';
       }
     });
-
-    // Forgot Password & Lockout Recovery Handler
-    async function handleForgotPassword() {
-      const emailInput = document.getElementById('loginEmail').value.trim().toLowerCase();
-      
-      if (!emailInput) {
-        const userProvidedEmail = prompt("Please enter your account email address:");
-        if (userProvidedEmail && userProvidedEmail.trim()) {
-          promptPasswordResetEmail(userProvidedEmail.trim().toLowerCase());
-        }
-      } else {
-        promptPasswordResetEmail(emailInput);
-      }
-    }
-
-    async function promptPasswordResetEmail(targetEmail) {
-      if (confirm(`Would you like your passcode sent to ${targetEmail}?`)) {
-        try {
-          const { data, error } = await supabaseClient
-            .from('registries')
-            .select('id, user_name, passcode')
-            .eq('user_email', targetEmail);
-
-          if (data && data.length > 0 && !error) {
-            const userRecord = data[0];
-
-            await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
-              to_name: userRecord.user_name || 'User',
-              email: targetEmail,
-              passcode: userRecord.passcode
-            });
-            showToast(`Passcode email sent to ${targetEmail}`);
-
-            await supabaseClient.from('registries').update({
-              failed_attempts: 0,
-              is_locked: false
-            }).eq('id', userRecord.id);
-
-          } else {
-            showToast("No account found matching that email.");
-          }
-        } catch (err) {
-          console.error("Error triggering password email:", err);
-          showToast("Failed to send recovery email. Please try again.");
-        }
-      }
-    }
 
     // Navigation Controllers
     function handleHeaderTitleClick() {
@@ -899,8 +795,8 @@
       renderRegistry();
     }
 
-    function logoutOwner() {
-      localStorage.removeItem('regisTree_owner_email');
+    async function logoutOwner() {
+      await supabaseClient.auth.signOut();
       isOwnerLoggedIn = false;
       currentViewMode = 'buyer';
       applyViewModeUI();
@@ -946,11 +842,9 @@
     function saveProfileSettings() {
       const nameInput = document.getElementById('userNameInput').value.trim();
       const venmoInput = document.getElementById('venmoHandleInput').value.trim().replace(/^@/, '');
-      const passInput = document.getElementById('ownerPasscodeInput').value.trim();
 
       if (nameInput) registryData.userName = nameInput;
       if (venmoInput) registryData.venmoHandle = venmoInput;
-      if (passInput) registryData.passcode = passInput;
 
       saveState();
       renderRegistry();
@@ -993,7 +887,6 @@
 
     function changeFilter(filterOption) {
       registryData.currentFilter = filterOption;
-      saveState();
       renderRegistry();
     }
 
@@ -1093,9 +986,6 @@
       }
       if (registryData.venmoHandle && document.getElementById('venmoHandleInput')) {
         document.getElementById('venmoHandleInput').value = registryData.venmoHandle;
-      }
-      if (registryData.passcode && document.getElementById('ownerPasscodeInput')) {
-        document.getElementById('ownerPasscodeInput').value = registryData.passcode;
       }
       if (document.getElementById('filterSelect')) {
         document.getElementById('filterSelect').value = registryData.currentFilter || 'all';
@@ -1338,9 +1228,7 @@
     }
 
     function escapeHtml(str) {
-      return str.replace(/[&<>"']/g, function(m) {
-        return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[m];
-      });
+      return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
     }
 
     // Initialize Application
