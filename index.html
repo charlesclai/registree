@@ -73,7 +73,7 @@
       <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-100 pb-6">
         <div>
           <h1 class="text-2xl font-bold text-slate-900" id="registryTitle">My regisTree</h1>
-          <p class="text-slate-500 text-sm mt-1" id="registrySubtext">Directly fund items to cut out shipping delays and packaging waste.</p>
+          <p class="text-slate-500 text-sm mt-1" id="registrySubtext">Buy the gifts they actually want. Directly fund items to cut out shipping coordination issues and to reduce packaging waste.</p>
         </div>
         <div class="bg-wood-100 p-3.5 rounded-xl border border-wood-500/20 text-xs text-wood-800">
           <span class="font-semibold block text-slate-700 mb-0.5">Recipient Venmo:</span>
@@ -102,7 +102,7 @@
         </div>
 
         <div class="pt-3 border-t border-slate-50 flex justify-between items-center">
-          <button type="button" onclick="saveProfileSettings()" class="bg-slate-800 hover:bg-slate-900 text-white text-xs font-medium px-4 py-2.5 rounded-lg transition">Save Profile Settings</button>
+          <button type="button" onclick="saveProfileSettings()" class="bg-slate-800 hover:bg-slate-900 text-white text-sm font-medium px-4 py-2.5 rounded-xl transition shadow-sm">Save Profile Settings</button>
           
           <button onclick="shareRegistry()" class="bg-wood-500 hover:bg-wood-800 text-white text-sm font-medium px-5 py-2.5 rounded-xl transition flex items-center gap-2 shadow-sm">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/></svg>
@@ -835,7 +835,7 @@
 
         creatorProfileSection.classList.remove('hidden');
         creatorAddItemSection.classList.remove('hidden');
-        registrySubtext.textContent = 'Directly fund items to cut out shipping delays and packaging waste.';
+        registrySubtext.textContent = 'Buy the gifts they actually want. Directly fund items to cut out shipping coordination issues and to reduce packaging waste.';
       }
     }
 
