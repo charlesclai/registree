@@ -36,7 +36,7 @@
     }
   </script>
 </head>
-<body class="bg-forest-50 text-slate-800 font-sans min-h-screen pb-16">
+<body class="bg-forest-50 text-slate-800 font-sans min-h-screen pb-28">
 
   <!-- Header / Navbar -->
   <header class="bg-white border-b border-forest-100 sticky top-0 z-10">
@@ -50,10 +50,6 @@
       
       <!-- Action Controls -->
       <div class="flex items-center gap-3">
-        <button onclick="openGlobalSearchModal()" class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium px-3 py-1.5 rounded-lg transition flex items-center gap-1.5" title="Search Registries">
-          <svg class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-          <span class="hidden sm:inline">Find Registry</span>
-        </button>
         <span id="modeBadge" class="text-xs bg-forest-100 text-forest-700 px-3 py-1 rounded-full font-medium text-center hidden">
           Owner View
         </span>
@@ -73,8 +69,8 @@
     </div>
 
     <!-- regisTree Banner & Header Info -->
-    <section id="registryMainSection" class="bg-white rounded-2xl p-6 shadow-sm border border-forest-100 mb-8 space-y-6">
-      <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-100 pb-6">
+    <section id="registryMainSection" class="bg-white rounded-2xl p-6 shadow-sm border border-forest-100 mb-8 space-y-4">
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div class="space-y-2">
           <div class="flex items-center gap-3">
             <h1 class="text-2xl font-bold text-slate-900" id="registryTitle">My regisTree</h1>
@@ -83,15 +79,21 @@
               <span id="followText">Follow</span>
             </button>
           </div>
-          <p class="text-slate-500 text-sm" id="registrySubtext">Buy the gifts they actually want. Directly fund items to cut out shipping coordination issues and to reduce packaging waste.</p>
+          <div class="space-y-1">
+            <p class="text-slate-500 text-sm" id="registrySubtext">Buy the gifts they actually want. Directly fund items to cut out shipping coordination issues and to reduce packaging waste.</p>
+            <div id="shareLinkContainer" class="text-xs text-slate-500 pt-1 flex items-center gap-1.5 hidden">
+              <span class="font-medium text-slate-600">Share your registry:</span>
+              <a href="#" id="shareRegistryAnchor" onclick="copyRegistryShareLink(event)" class="text-forest-600 font-mono hover:underline truncate max-w-[280px] sm:max-w-md"></a>
+            </div>
+          </div>
           
-          <!-- OWNER SOCIAL STATS CONTAINER -->
-          <div id="ownerSocialStats" class="flex items-center gap-3 text-xs pt-1 hidden">
-            <button onclick="openFollowersModal()" class="text-slate-600 hover:text-forest-600 font-medium transition flex items-center gap-1">
+          <!-- REGISTRY SOCIAL STATS CONTAINER (VISIBLE ON ALL REGISTRIES) -->
+          <div id="registrySocialStats" class="flex items-center gap-3 text-xs pt-1 hidden">
+            <button onclick="openRegistryFollowersModal()" class="text-slate-600 hover:text-forest-600 font-medium transition flex items-center gap-1">
               <span id="followerCountBadge" class="font-bold text-slate-900">0</span> Followers
             </button>
             <span class="text-slate-300">&bull;</span>
-            <button onclick="openFollowingModal()" class="text-slate-600 hover:text-forest-600 font-medium transition flex items-center gap-1">
+            <button onclick="openRegistryFollowingModal()" class="text-slate-600 hover:text-forest-600 font-medium transition flex items-center gap-1">
               <span id="followingCountBadge" class="font-bold text-slate-900">0</span> Following
             </button>
           </div>
@@ -100,49 +102,6 @@
         <div class="bg-wood-100 p-3.5 rounded-xl border border-wood-500/20 text-xs text-wood-800 shrink-0">
           <span class="font-semibold block text-slate-700 mb-0.5">Recipient Venmo:</span>
           <span id="venmoDisplay" class="font-mono text-forest-600 font-semibold text-sm">Not set</span>
-        </div>
-      </div>
-
-      <!-- OWNER ONLY: Account Profile Controls -->
-      <div id="creatorProfileSection" class="space-y-4 hidden">
-        <h3 class="text-sm font-bold text-slate-800 uppercase tracking-wider">Account & Profile Settings</h3>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label for="userNameInput" class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1">Your Name</label>
-            <input type="text" id="userNameInput" placeholder="e.g. Charles" class="w-full px-3 py-2 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-forest-600 text-sm" />
-          </div>
-
-          <div>
-            <label for="venmoHandleInput" class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1">Venmo Handle</label>
-            <input type="text" id="venmoHandleInput" placeholder="e.g. Charles-Smith" class="w-full px-3 py-2 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-forest-600 text-sm" />
-          </div>
-
-          <div>
-            <label for="userEmailInput" class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1">Account Email</label>
-            <input type="email" id="userEmailInput" disabled class="w-full px-3 py-2 rounded-lg border border-slate-100 bg-slate-50 text-slate-500 text-sm cursor-not-allowed" />
-          </div>
-
-          <div>
-            <label for="newPasswordInput" class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1">New Password</label>
-            <div class="relative">
-              <input type="password" id="newPasswordInput" placeholder="Leave blank to keep current" class="w-full px-3 py-2 pr-10 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-forest-600 text-sm" />
-              <button type="button" onclick="togglePasswordVisibility('newPasswordInput', 'eyeIconNewPassword')" class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600">
-                <svg id="eyeIconNewPassword" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                </svg>
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <div class="pt-3 border-t border-slate-50 flex justify-between items-center">
-          <button type="button" onclick="saveProfileSettings()" class="bg-slate-800 hover:bg-slate-900 text-white text-sm font-medium px-4 py-2.5 rounded-xl transition shadow-sm">Save Profile Settings</button>
-          
-          <button onclick="shareRegistry()" class="bg-wood-500 hover:bg-wood-800 text-white text-sm font-medium px-5 py-2.5 rounded-xl transition flex items-center gap-2 shadow-sm">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/></svg>
-            <span>Share regisTree Link</span>
-          </button>
         </div>
       </div>
     </section>
@@ -261,6 +220,102 @@
 
   </main>
 
+  <!-- FLOATING OWNER NAVIGATION BAR -->
+  <div id="floatingOwnerNav" class="fixed bottom-4 left-1/2 -translate-x-1/2 bg-white/95 backdrop-blur-md border border-forest-100 shadow-2xl rounded-2xl px-3 py-2 z-40 hidden flex items-center gap-1 sm:gap-3">
+    <button onclick="handleFloatingHome()" class="flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-xl hover:bg-forest-50 text-slate-600 hover:text-forest-700 transition group" title="Home">
+      <svg class="w-5 h-5 text-slate-500 group-hover:text-forest-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+      <span class="text-[10px] font-medium">Home</span>
+    </button>
+
+    <button onclick="handleFloatingShare()" class="flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-xl hover:bg-forest-50 text-slate-600 hover:text-forest-700 transition group" title="Preview Registry">
+      <svg class="w-5 h-5 text-slate-500 group-hover:text-forest-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+      <span class="text-[10px] font-medium">Preview</span>
+    </button>
+
+    <button onclick="openGlobalSearchModal()" class="flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-xl hover:bg-forest-50 text-slate-600 hover:text-forest-700 transition group" title="Search Registries">
+      <svg class="w-5 h-5 text-slate-500 group-hover:text-forest-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+      <span class="text-[10px] font-medium">Search</span>
+    </button>
+
+    <button onclick="openNotificationsModal()" class="relative flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-xl hover:bg-forest-50 text-slate-600 hover:text-forest-700 transition group" title="Notifications">
+      <svg class="w-5 h-5 text-slate-500 group-hover:text-forest-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+      <span class="text-[10px] font-medium">Notifications</span>
+      <span id="notificationBadgeDot" class="absolute top-1 right-3 w-2 h-2 bg-red-500 rounded-full hidden"></span>
+    </button>
+
+    <button onclick="openSettingsModal()" class="flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-xl hover:bg-forest-50 text-slate-600 hover:text-forest-700 transition group" title="Settings">
+      <svg class="w-5 h-5 text-slate-500 group-hover:text-forest-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+      <span class="text-[10px] font-medium">Settings</span>
+    </button>
+  </div>
+
+  <!-- NOTIFICATIONS MODAL -->
+  <div id="notificationsModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm hidden flex items-center justify-center z-50 p-4">
+    <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-xl border border-slate-100 space-y-4 relative max-h-[80vh] flex flex-col">
+      <button onclick="closeNotificationsModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 p-1 rounded-lg hover:bg-slate-100 transition">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+      </button>
+
+      <div>
+        <h3 class="text-lg font-semibold text-slate-950 mb-0.5">Notifications</h3>
+        <p class="text-xs text-slate-500">Recent activity on your regisTree</p>
+      </div>
+
+      <div id="notificationsListContainer" class="space-y-2 overflow-y-auto flex-grow pr-1">
+        <!-- Rendered dynamically -->
+      </div>
+    </div>
+  </div>
+
+  <!-- SETTINGS MODAL -->
+  <div id="settingsModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm hidden flex items-center justify-center z-50 p-4">
+    <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-xl border border-slate-100 space-y-4 relative">
+      <button onclick="closeSettingsModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 p-1 rounded-lg hover:bg-slate-100 transition">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+      </button>
+
+      <div>
+        <h3 class="text-lg font-semibold text-slate-900 mb-0.5">Account & Profile Settings</h3>
+        <p class="text-xs text-slate-500">Update your name, Venmo handle, or password.</p>
+      </div>
+
+      <div class="space-y-3">
+        <div>
+          <label for="settingsUserNameInput" class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1">Your Name</label>
+          <input type="text" id="settingsUserNameInput" placeholder="e.g. Charles" class="w-full px-3 py-2 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-forest-600 text-sm" />
+        </div>
+
+        <div>
+          <label for="settingsVenmoInput" class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1">Venmo Handle</label>
+          <input type="text" id="settingsVenmoInput" placeholder="e.g. Charles-Smith" class="w-full px-3 py-2 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-forest-600 text-sm" />
+        </div>
+
+        <div>
+          <label for="settingsEmailInput" class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1">Account Email</label>
+          <input type="email" id="settingsEmailInput" disabled class="w-full px-3 py-2 rounded-lg border border-slate-100 bg-slate-50 text-slate-500 text-sm cursor-not-allowed" />
+        </div>
+
+        <div>
+          <label for="settingsPasswordInput" class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1">New Password</label>
+          <div class="relative">
+            <input type="password" id="settingsPasswordInput" placeholder="Leave blank to keep current" class="w-full px-3 py-2 pr-10 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-forest-600 text-sm" />
+            <button type="button" onclick="togglePasswordVisibility('settingsPasswordInput', 'eyeIconSettingsPassword')" class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600">
+              <svg id="eyeIconSettingsPassword" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="pt-3 border-t border-slate-100 flex justify-end gap-2">
+        <button type="button" onclick="closeSettingsModal()" class="px-4 py-2 rounded-xl text-sm font-medium text-slate-600 hover:bg-slate-100 transition">Cancel</button>
+        <button type="button" onclick="saveSettingsModal()" class="px-5 py-2 rounded-xl text-sm font-medium bg-forest-600 hover:bg-forest-700 text-white transition shadow-sm">Save Changes</button>
+      </div>
+    </div>
+  </div>
+
   <!-- FOLLOWERS / FOLLOWING LIST MODAL -->
   <div id="socialListModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm hidden flex items-center justify-center z-50 p-4">
     <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-xl border border-slate-100 space-y-4 relative max-h-[80vh] flex flex-col">
@@ -270,7 +325,7 @@
 
       <div>
         <h3 id="socialModalTitle" class="text-lg font-semibold text-slate-950 mb-0.5">Followers</h3>
-        <p id="socialModalSub" class="text-xs text-slate-500">People following your regisTree</p>
+        <p id="socialModalSub" class="text-xs text-slate-500">People following this regisTree</p>
       </div>
 
       <div id="socialListContainer" class="space-y-2 overflow-y-auto flex-grow pr-1">
@@ -288,7 +343,7 @@
 
       <div>
         <h3 class="text-lg font-semibold text-slate-900 mb-1">Find a regisTree</h3>
-        <p class="text-xs text-slate-500">Search for friend or family registries using their Venmo handle.</p>
+        <p class="text-xs text-slate-500">Search for friend or family member registries using their Venmo handle.</p>
       </div>
 
       <form id="globalSearchForm" class="space-y-3">
@@ -496,11 +551,14 @@
     let activeRegistryId = null;
     let loggedInUserId = null;
     let loggedInUserEmail = null;
+    let loggedInUserRegistryId = null;
     let isOwnerLoggedIn = false;
-    let currentViewMode = 'buyer';
+    let isPreviewMode = false;
     let activeFundingItemId = null;
     let followedRegistryIds = [];
     let followersList = [];
+    let activeRegistryFollowersList = [];
+    let hasUnreadNotifications = false;
 
     let registryData = {
       userId: "",
@@ -536,7 +594,6 @@
     
     const modeBadge = document.getElementById('modeBadge');
     const authNavContainer = document.getElementById('authNavContainer');
-    const creatorProfileSection = document.getElementById('creatorProfileSection');
     const creatorAddItemSection = document.getElementById('creatorAddItemSection');
     const registryMainSection = document.getElementById('registryMainSection');
     const wishlistSection = document.getElementById('wishlistSection');
@@ -545,9 +602,13 @@
     const followingListContainer = document.getElementById('followingListContainer');
     const followButton = document.getElementById('followButton');
     const followText = document.getElementById('followText');
-    const ownerSocialStats = document.getElementById('ownerSocialStats');
+    const registrySocialStats = document.getElementById('registrySocialStats');
     const followerCountBadge = document.getElementById('followerCountBadge');
     const followingCountBadge = document.getElementById('followingCountBadge');
+    const floatingOwnerNav = document.getElementById('floatingOwnerNav');
+    const shareLinkContainer = document.getElementById('shareLinkContainer');
+    const shareRegistryAnchor = document.getElementById('shareRegistryAnchor');
+    const notificationBadgeDot = document.getElementById('notificationBadgeDot');
 
     const currencyFormatter = new Intl.NumberFormat('en-US', {
       style: 'currency',
@@ -598,6 +659,7 @@
     async function loadState() {
       const urlParams = new URLSearchParams(window.location.search);
       activeRegistryId = urlParams.get('id');
+      isPreviewMode = urlParams.get('preview') === 'true';
 
       const { data: { session } } = await supabaseClient.auth.getSession();
       if (session && session.user) {
@@ -610,11 +672,10 @@
 
       await loadUserFollows();
 
-      if (!activeRegistryId && loggedInUserId) {
+      if (loggedInUserId) {
         const storedRegId = localStorage.getItem(`registree_owner_${loggedInUserId}`);
         if (storedRegId) {
-          window.location.replace(`${window.location.pathname}?id=${storedRegId}`);
-          return;
+          loggedInUserRegistryId = storedRegId;
         } else {
           try {
             const { data } = await supabaseClient
@@ -622,17 +683,26 @@
               .select('id')
               .eq('user_email', loggedInUserEmail);
             if (data && data.length > 0) {
-              localStorage.setItem(`registree_owner_${loggedInUserId}`, data[0].id);
-              window.location.replace(`${window.location.pathname}?id=${data[0].id}`);
-              return;
+              loggedInUserRegistryId = data[0].id;
+              localStorage.setItem(`registree_owner_${loggedInUserId}`, loggedInUserRegistryId);
             }
           } catch (e) {
-            console.error("Auto-redirect lookup error:", e);
+            console.error("Owner registry lookup error:", e);
           }
         }
       }
 
-      if (activeRegistryId) {
+      if (!activeRegistryId && loggedInUserId && loggedInUserRegistryId) {
+        window.location.replace(`${window.location.pathname}?id=${loggedInUserRegistryId}`);
+        return;
+      }
+
+      let targetId = activeRegistryId;
+      if (isPreviewMode && loggedInUserRegistryId) {
+        targetId = loggedInUserRegistryId;
+      }
+
+      if (targetId) {
         registryMainSection.classList.remove('hidden');
         wishlistSection.classList.remove('hidden');
         homeLandingSection.classList.add('hidden');
@@ -641,7 +711,7 @@
           const { data, error } = await supabaseClient
             .from('registries')
             .select('id, user_id, user_name, user_email, venmo_handle, current_sort, items')
-            .eq('id', activeRegistryId);
+            .eq('id', targetId);
 
           if (data && data.length > 0 && !error) {
             const match = data[0];
@@ -657,6 +727,7 @@
 
             if (loggedInUserId && (match.user_id === loggedInUserId || (match.user_email && match.user_email.toLowerCase().trim() === loggedInUserEmail))) {
               localStorage.setItem(`registree_owner_${loggedInUserId}`, match.id);
+              loggedInUserRegistryId = match.id;
             }
           } else {
             resetRegistryData();
@@ -673,18 +744,24 @@
         renderFollowingFeed();
       }
 
-      if (loggedInUserEmail && registryData.userEmail && loggedInUserEmail === registryData.userEmail.toLowerCase().trim()) {
+      if (!isPreviewMode && loggedInUserEmail && registryData.userEmail && loggedInUserEmail === registryData.userEmail.toLowerCase().trim()) {
         isOwnerLoggedIn = true;
-      } else if (loggedInUserId && registryData.userId && loggedInUserId === registryData.userId) {
+      } else if (!isPreviewMode && loggedInUserId && registryData.userId && loggedInUserId === registryData.userId) {
         isOwnerLoggedIn = true;
       } else {
         isOwnerLoggedIn = false;
       }
 
-      currentViewMode = isOwnerLoggedIn ? 'owner' : 'buyer';
-      
+      if (loggedInUserRegistryId && loggedInUserRegistryId === activeRegistryId && isPreviewMode) {
+        isOwnerLoggedIn = false;
+      }
+
+      if (loggedInUserId && loggedInUserRegistryId) {
+        await loadLoggedInUserFollowers();
+      }
+
       if (activeRegistryId) {
-        await loadRegistryFollowers();
+        await loadActiveRegistryFollowers();
       }
 
       applyViewModeUI();
@@ -709,8 +786,39 @@
       }
     }
 
-    async function loadRegistryFollowers() {
+    async function loadLoggedInUserFollowers() {
       followersList = [];
+      if (!loggedInUserRegistryId || !loggedInUserId) return;
+
+      try {
+        const { data, error } = await supabaseClient
+          .from('follows')
+          .select('user_id, created_at')
+          .eq('following_registry_id', loggedInUserRegistryId);
+
+        if (data && !error && data.length > 0) {
+          const followerUserIds = data.map(row => row.user_id);
+          const { data: regData } = await supabaseClient
+            .from('registries')
+            .select('id, user_id, user_name, venmo_handle')
+            .in('user_id', followerUserIds);
+
+          if (regData) {
+            followersList = regData;
+          }
+
+          const lastCheckedTime = localStorage.getItem(`registree_notif_checked_${loggedInUserRegistryId}`) || 0;
+          const hasNew = data.some(row => new Date(row.created_at).getTime() > Number(lastCheckedTime));
+          hasUnreadNotifications = hasNew;
+          updateNotificationBadgeUI();
+        }
+      } catch (err) {
+        console.error("Error loading user followers:", err);
+      }
+    }
+
+    async function loadActiveRegistryFollowers() {
+      activeRegistryFollowersList = [];
       if (!activeRegistryId) return;
 
       try {
@@ -727,12 +835,61 @@
             .in('user_id', followerUserIds);
 
           if (regData) {
-            followersList = regData;
+            activeRegistryFollowersList = regData;
           }
         }
       } catch (err) {
-        console.error("Error loading registry followers:", err);
+        console.error("Error loading active registry followers:", err);
       }
+    }
+
+    function updateNotificationBadgeUI() {
+      if (hasUnreadNotifications && loggedInUserId) {
+        notificationBadgeDot.classList.remove('hidden');
+      } else {
+        notificationBadgeDot.classList.add('hidden');
+      }
+    }
+
+    async function openNotificationsModal() {
+      if (!loggedInUserId) return;
+      
+      if (!followersList.length && loggedInUserRegistryId) {
+        await loadLoggedInUserFollowers();
+      }
+
+      const modal = document.getElementById('notificationsModal');
+      const container = document.getElementById('notificationsListContainer');
+      container.innerHTML = '';
+
+      hasUnreadNotifications = false;
+      if (loggedInUserRegistryId) {
+        localStorage.setItem(`registree_notif_checked_${loggedInUserRegistryId}`, Date.now());
+      }
+      updateNotificationBadgeUI();
+
+      if (followersList.length === 0) {
+        container.innerHTML = `<p class="text-xs text-slate-400 text-center py-6">No new notifications or followers yet.</p>`;
+      } else {
+        followersList.forEach(reg => {
+          const item = document.createElement('div');
+          item.className = 'flex items-center justify-between bg-slate-50 border border-slate-200 p-3 rounded-xl hover:bg-forest-50 transition cursor-pointer';
+          item.onclick = () => { window.location.href = `${window.location.pathname}?id=${reg.id}`; };
+          item.innerHTML = `
+            <div>
+              <span class="font-bold text-slate-800 text-sm block">${escapeHtml(reg.user_name || 'Unnamed')} started following your regisTree</span>
+              <span class="font-mono text-xs text-forest-600">@${escapeHtml(reg.venmo_handle)}</span>
+            </div>
+            <span class="text-xs bg-forest-600 text-white font-medium px-3 py-1.5 rounded-lg">View &rarr;</span>
+          `;
+          container.appendChild(item);
+        });
+      }
+      modal.classList.remove('hidden');
+    }
+
+    function closeNotificationsModal() {
+      document.getElementById('notificationsModal').classList.add('hidden');
     }
 
     async function toggleFollowCurrentRegistry() {
@@ -764,7 +921,10 @@
           showToast("Successfully followed registry!");
         }
         updateFollowButtonUI();
-        await loadRegistryFollowers();
+        if (loggedInUserRegistryId === activeRegistryId) {
+          await loadLoggedInUserFollowers();
+        }
+        await loadActiveRegistryFollowers();
         updateSocialCountsUI();
       } catch (err) {
         console.error("Error updating follow state:", err);
@@ -773,7 +933,7 @@
     }
 
     function updateFollowButtonUI() {
-      if (!activeRegistryId || (loggedInUserId && (registryData.userId === loggedInUserId || isOwnerLoggedIn))) {
+      if (!activeRegistryId || (loggedInUserId && (registryData.userId === loggedInUserId || (loggedInUserRegistryId === activeRegistryId && !isPreviewMode)))) {
         followButton.classList.add('hidden');
         return;
       }
@@ -792,22 +952,43 @@
       }
     }
 
-    function updateSocialCountsUI() {
-      followerCountBadge.textContent = followersList.length;
-      followingCountBadge.textContent = followedRegistryIds.length;
+    async function getRegistryFollowingCount(regUserId) {
+      if (!regUserId) return 0;
+      try {
+        const { count, error } = await supabaseClient
+          .from('follows')
+          .select('*', { count: 'exact', head: true })
+          .eq('user_id', regUserId);
+        if (!error) return count || 0;
+      } catch (e) {
+        console.error("Error fetching following count:", e);
+      }
+      return 0;
     }
 
-    async function openFollowersModal() {
+    async function updateSocialCountsUI() {
+      if (!activeRegistryId) return;
+      registrySocialStats.classList.remove('hidden');
+      followerCountBadge.textContent = activeRegistryFollowersList.length;
+
+      let followingCount = 0;
+      if (registryData.userId) {
+        followingCount = await getRegistryFollowingCount(registryData.userId);
+      }
+      followingCountBadge.textContent = followingCount;
+    }
+
+    async function openRegistryFollowersModal() {
       const modal = document.getElementById('socialListModal');
       document.getElementById('socialModalTitle').textContent = 'Followers';
       document.getElementById('socialModalSub').textContent = 'People following this regisTree';
       const container = document.getElementById('socialListContainer');
       container.innerHTML = '';
 
-      if (followersList.length === 0) {
+      if (activeRegistryFollowersList.length === 0) {
         container.innerHTML = `<p class="text-xs text-slate-400 text-center py-6">No followers yet.</p>`;
       } else {
-        followersList.forEach(reg => {
+        activeRegistryFollowersList.forEach(reg => {
           const item = document.createElement('div');
           item.className = 'flex items-center justify-between bg-slate-50 border border-slate-200 p-3 rounded-xl hover:bg-forest-50 transition cursor-pointer';
           item.onclick = () => { window.location.href = `${window.location.pathname}?id=${reg.id}`; };
@@ -824,24 +1005,34 @@
       modal.classList.remove('hidden');
     }
 
-    async function openFollowingModal() {
+    async function openRegistryFollowingModal() {
       const modal = document.getElementById('socialListModal');
       document.getElementById('socialModalTitle').textContent = 'Following';
-      document.getElementById('socialModalSub').textContent = 'Registries you are following';
+      document.getElementById('socialModalSub').textContent = 'Registries this user is following';
       const container = document.getElementById('socialListContainer');
       container.innerHTML = '';
 
-      if (followedRegistryIds.length === 0) {
-        container.innerHTML = `<p class="text-xs text-slate-400 text-center py-6">You are not following any registries yet.</p>`;
-      } else {
-        try {
-          const { data, error } = await supabaseClient
+      if (!registryData.userId) {
+        container.innerHTML = `<p class="text-xs text-slate-400 text-center py-6">No following details found.</p>`;
+        modal.classList.remove('hidden');
+        return;
+      }
+
+      try {
+        const { data: followRows, error: followErr } = await supabaseClient
+          .from('follows')
+          .select('following_registry_id')
+          .eq('user_id', registryData.userId);
+
+        if (followRows && followRows.length > 0 && !followErr) {
+          const targetRegIds = followRows.map(r => r.following_registry_id);
+          const { data: regData } = await supabaseClient
             .from('registries')
             .select('id, user_name, venmo_handle, items')
-            .in('id', followedRegistryIds);
+            .in('id', targetRegIds);
 
-          if (data && data.length > 0 && !error) {
-            data.forEach(reg => {
+          if (regData && regData.length > 0) {
+            regData.forEach(reg => {
               const item = document.createElement('div');
               item.className = 'flex items-center justify-between bg-slate-50 border border-slate-200 p-3 rounded-xl hover:bg-forest-50 transition cursor-pointer';
               item.onclick = () => { window.location.href = `${window.location.pathname}?id=${reg.id}`; };
@@ -855,12 +1046,14 @@
               container.appendChild(item);
             });
           } else {
-            container.innerHTML = `<p class="text-xs text-slate-400 text-center py-6">No following details found.</p>`;
+            container.innerHTML = `<p class="text-xs text-slate-400 text-center py-6">Not following any registries yet.</p>`;
           }
-        } catch (err) {
-          console.error("Error loading following modal list:", err);
-          container.innerHTML = `<p class="text-xs text-red-500 text-center py-6">Failed to load following list.</p>`;
+        } else {
+          container.innerHTML = `<p class="text-xs text-slate-400 text-center py-6">Not following any registries yet.</p>`;
         }
+      } catch (err) {
+        console.error("Error loading target user following modal list:", err);
+        container.innerHTML = `<p class="text-xs text-red-500 text-center py-6">Failed to load following list.</p>`;
       }
       modal.classList.remove('hidden');
     }
@@ -1031,8 +1224,90 @@
       }
     });
 
+    // SETTINGS MODAL HANDLERS (ALWAYS LOADS LOGGED-IN USER DETAILS)
+    async function openSettingsModal() {
+      if (!loggedInUserId || !loggedInUserRegistryId) {
+        openAuthModal('login');
+        showToast("Please log in to access account settings.");
+        return;
+      }
+      
+      let settingsName = '';
+      let settingsVenmo = '';
+      let settingsEmail = loggedInUserEmail || '';
+
+      try {
+        const { data } = await supabaseClient
+          .from('registries')
+          .select('user_name, venmo_handle, user_email')
+          .eq('id', loggedInUserRegistryId);
+        if (data && data.length > 0) {
+          settingsName = data[0].user_name;
+          settingsVenmo = data[0].venmo_handle;
+          settingsEmail = data[0].user_email || loggedInUserEmail;
+        }
+      } catch(e) {
+        console.error("Error fetching logged-in user settings data:", e);
+      }
+
+      if (document.getElementById('settingsUserNameInput')) {
+        document.getElementById('settingsUserNameInput').value = settingsName || '';
+      }
+      if (document.getElementById('settingsVenmoInput')) {
+        document.getElementById('settingsVenmoInput').value = settingsVenmo || '';
+      }
+      if (document.getElementById('settingsEmailInput')) {
+        document.getElementById('settingsEmailInput').value = settingsEmail || '';
+      }
+      document.getElementById('settingsPasswordInput').value = '';
+      document.getElementById('settingsModal').classList.remove('hidden');
+    }
+
+    function closeSettingsModal() {
+      document.getElementById('settingsModal').classList.add('hidden');
+    }
+
+    async function saveSettingsModal() {
+      if (!loggedInUserId || !loggedInUserRegistryId) return;
+      const nameInput = document.getElementById('settingsUserNameInput').value.trim();
+      const venmoInput = document.getElementById('settingsVenmoInput').value.trim().replace(/^@/, '');
+      const newPasswordInput = document.getElementById('settingsPasswordInput').value.trim();
+
+      if (newPasswordInput) {
+        try {
+          const { error: updateAuthErr } = await supabaseClient.auth.updateUser({
+            password: newPasswordInput
+          });
+          if (updateAuthErr) throw updateAuthErr;
+        } catch (err) {
+          console.error("Password update error:", err);
+          showToast("Failed to update password: " + err.message);
+          return;
+        }
+      }
+
+      try {
+        await supabaseClient.from('registries').update({
+          user_name: nameInput,
+          venmo_handle: venmoInput,
+          updated_at: new Date()
+        }).eq('id', loggedInUserRegistryId);
+      } catch (e) {
+        console.error("Error updating user registry settings:", e);
+      }
+
+      if (loggedInUserRegistryId === activeRegistryId) {
+        registryData.userName = nameInput;
+        registryData.venmoHandle = venmoInput;
+        renderRegistry();
+      }
+
+      closeSettingsModal();
+      showToast(newPasswordInput ? "Settings & password updated successfully!" : "Account settings saved successfully!");
+    }
+
     async function saveState() {
-      if (!activeRegistryId) return;
+      if (!activeRegistryId || !isOwnerLoggedIn) return;
 
       try {
         const { error } = await supabaseClient.from('registries').upsert({
@@ -1123,6 +1398,7 @@
         activeRegistryId = newRegistryId;
         loggedInUserId = userId;
         loggedInUserEmail = email;
+        loggedInUserRegistryId = newRegistryId;
         localStorage.setItem(`registree_owner_${userId}`, newRegistryId);
 
         registryData = {
@@ -1136,7 +1412,7 @@
         };
 
         isOwnerLoggedIn = true;
-        currentViewMode = 'owner';
+        isPreviewMode = false;
 
         window.location.replace(`${window.location.pathname}?id=${activeRegistryId}`);
       } catch (err) {
@@ -1178,6 +1454,7 @@
           const userAccount = data[0];
 
           activeRegistryId = userAccount.id;
+          loggedInUserRegistryId = userAccount.id;
           localStorage.setItem(`registree_owner_${userId}`, activeRegistryId);
 
           loginSubmitBtn.disabled = false;
@@ -1198,20 +1475,36 @@
     });
 
     function handleHeaderTitleClick() {
-      if (loggedInUserId) {
-        const storedRegId = localStorage.getItem(`registree_owner_${loggedInUserId}`);
-        if (storedRegId) {
-          window.location.href = `${window.location.pathname}?id=${storedRegId}`;
-          return;
-        }
+      if (loggedInUserId && loggedInUserRegistryId) {
+        window.location.href = `${window.location.pathname}?id=${loggedInUserRegistryId}`;
+        return;
       }
       window.location.href = window.location.pathname;
     }
 
-    function toggleOwnerEditView() {
-      currentViewMode = currentViewMode === 'owner' ? 'buyer' : 'owner';
-      applyViewModeUI();
-      renderRegistry();
+    function handleFloatingHome() {
+      if (loggedInUserId && loggedInUserRegistryId) {
+        window.location.href = `${window.location.pathname}?id=${loggedInUserRegistryId}`;
+        return;
+      }
+      window.location.href = window.location.pathname;
+    }
+
+    function handleFloatingShare() {
+      if (loggedInUserId && loggedInUserRegistryId) {
+        window.location.href = `${window.location.pathname}?id=${loggedInUserRegistryId}&preview=true`;
+      }
+    }
+
+    function copyRegistryShareLink(e) {
+      e.preventDefault();
+      if (!activeRegistryId) return;
+      const shareUrl = `${window.location.origin}${window.location.pathname}?id=${activeRegistryId}`;
+      navigator.clipboard.writeText(shareUrl).then(() => {
+        showToast("Registry link copied to clipboard!");
+      }).catch(() => {
+        prompt("Copy your shareable regisTree link:", shareUrl);
+      });
     }
 
     async function logoutOwner() {
@@ -1220,18 +1513,17 @@
       }
       await supabaseClient.auth.signOut();
       isOwnerLoggedIn = false;
+      isPreviewMode = false;
       loggedInUserId = null;
       loggedInUserEmail = null;
-      currentViewMode = 'buyer';
+      loggedInUserRegistryId = null;
       window.location.href = window.location.pathname;
     }
 
     function applyViewModeUI() {
       if (loggedInUserId) {
-        if (isOwnerLoggedIn) {
+        if (isOwnerLoggedIn && !isPreviewMode) {
           authNavContainer.innerHTML = `
-            <button onclick="toggleOwnerEditView()" class="text-xs font-semibold text-forest-600 hover:text-forest-800 underline">${currentViewMode === 'owner' ? 'Preview Buyer View' : 'Owner View'}</button>
-            <span class="text-slate-300">|</span>
             <button onclick="logoutOwner()" class="text-xs text-slate-400 hover:text-red-600 underline">Log Out</button>`;
         } else {
           authNavContainer.innerHTML = `
@@ -1246,60 +1538,32 @@
           <button onclick="openAuthModal('login')" class="text-xs text-slate-500 hover:text-slate-700 underline">Owner Login</button>`;
       }
 
-      if (currentViewMode === 'owner' && isOwnerLoggedIn) {
+      if (isOwnerLoggedIn && !isPreviewMode) {
         modeBadge.textContent = 'Owner View';
         modeBadge.className = 'text-xs bg-forest-100 text-forest-700 px-3 py-1 rounded-full font-medium text-center';
         modeBadge.classList.remove('hidden');
 
-        creatorProfileSection.classList.remove('hidden');
         creatorAddItemSection.classList.remove('hidden');
-        ownerSocialStats.classList.remove('hidden');
       } else {
         modeBadge.classList.add('hidden');
-        creatorProfileSection.classList.add('hidden');
         creatorAddItemSection.classList.add('hidden');
-        ownerSocialStats.classList.add('hidden');
-      }
-    }
-
-    async function saveProfileSettings() {
-      const nameInput = document.getElementById('userNameInput').value.trim();
-      const venmoInput = document.getElementById('venmoHandleInput').value.trim().replace(/^@/, '');
-      const newPasswordInput = document.getElementById('newPasswordInput').value.trim();
-
-      if (nameInput) registryData.userName = nameInput;
-      if (venmoInput) registryData.venmoHandle = venmoInput;
-
-      if (newPasswordInput) {
-        try {
-          const { error: updateAuthErr } = await supabaseClient.auth.updateUser({
-            password: newPasswordInput
-          });
-          if (updateAuthErr) throw updateAuthErr;
-          document.getElementById('newPasswordInput').value = '';
-        } catch (err) {
-          console.error("Password update error:", err);
-          showToast("Failed to update password: " + err.message);
-          return;
-        }
       }
 
-      await saveState();
-      renderRegistry();
-      showToast(newPasswordInput ? "Profile and password updated successfully!" : "Account profile settings saved!");
-    }
-
-    function shareRegistry() {
-      if (!activeRegistryId) {
-        alert("Please create an account first to generate your unique share link.");
-        return;
+      if (loggedInUserId) {
+        floatingOwnerNav.classList.remove('hidden');
+      } else {
+        floatingOwnerNav.classList.add('hidden');
       }
-      const shareUrl = `${window.location.origin}${window.location.pathname}?id=${activeRegistryId}`;
-      navigator.clipboard.writeText(shareUrl).then(() => {
-        showToast("Shareable buyer link copied to clipboard!");
-      }).catch(() => {
-        prompt("Copy your shareable regisTree link:", shareUrl);
-      });
+
+      // Update Share Link Display
+      if (activeRegistryId) {
+        const shareUrl = `${window.location.origin}${window.location.pathname}?id=${activeRegistryId}`;
+        shareRegistryAnchor.textContent = shareUrl;
+        shareRegistryAnchor.href = shareUrl;
+        shareLinkContainer.classList.remove('hidden');
+      } else {
+        shareLinkContainer.classList.add('hidden');
+      }
     }
 
     function showToast(msg) {
@@ -1330,7 +1594,9 @@
 
     function changeSort(sortOption) {
       registryData.currentSort = sortOption;
-      saveState();
+      if (isOwnerLoggedIn && !isPreviewMode) {
+        saveState();
+      }
       renderRegistry();
     }
 
@@ -1415,15 +1681,6 @@
       
       venmoDisplay.textContent = registryData.venmoHandle ? `@${registryData.venmoHandle}` : 'Not set';
 
-      if (registryData.userName && document.getElementById('userNameInput')) {
-        document.getElementById('userNameInput').value = registryData.userName;
-      }
-      if (registryData.userEmail && document.getElementById('userEmailInput')) {
-        document.getElementById('userEmailInput').value = registryData.userEmail;
-      }
-      if (registryData.venmoHandle && document.getElementById('venmoHandleInput')) {
-        document.getElementById('venmoHandleInput').value = registryData.venmoHandle;
-      }
       if (document.getElementById('filterSelect')) {
         document.getElementById('filterSelect').value = registryData.currentFilter || 'all';
       }
@@ -1438,7 +1695,7 @@
           <div class="bg-white p-12 rounded-2xl text-center text-slate-400 border border-slate-100">
             <svg class="w-12 h-12 mx-auto text-slate-300 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"/></svg>
             <p class="font-medium text-slate-600">This regisTree is currently empty</p>
-            <p class="text-xs text-slate-400 mt-1">${currentViewMode === 'owner' && isOwnerLoggedIn ? 'Paste a product URL above to add your first item.' : 'Check back later for newly added items.'}</p>
+            <p class="text-xs text-slate-400 mt-1">${isOwnerLoggedIn && !isPreviewMode ? 'Paste a product URL above to add your first item.' : 'Check back later for newly added items.'}</p>
           </div>`;
         return;
       }
@@ -1456,7 +1713,7 @@
         const itemCard = document.createElement('div');
         itemCard.className = `bg-white rounded-2xl p-4 sm:p-5 shadow-sm border transition-all ${item.funded ? 'border-forest-100 bg-forest-50/40' : 'border-slate-100 hover:border-slate-200'}`;
 
-        const isOwner = currentViewMode === 'owner' && isOwnerLoggedIn;
+        const isOwner = isOwnerLoggedIn && !isPreviewMode;
         const imageSrc = item.imageUrl || '';
 
         itemCard.innerHTML = `
@@ -1521,6 +1778,7 @@
 
     addItemForm.addEventListener('submit', async (e) => {
       e.preventDefault();
+      if (!isOwnerLoggedIn || isPreviewMode) return;
       const urlInput = document.getElementById('itemUrl');
       const rawUrl = urlInput.value.trim();
       const normalizedUrl = normalizeUrl(rawUrl);
@@ -1552,7 +1810,7 @@
     });
 
     function deleteRegistryItem(id) {
-      if (currentViewMode !== 'owner') return;
+      if (!isOwnerLoggedIn || isPreviewMode) return;
 
       const item = registryData.items.find(i => i.id === id);
       if (item && confirm(`Are you sure you want to delete "${item.name}"?`)) {
@@ -1563,13 +1821,14 @@
     }
 
     function deleteModalItem() {
+      if (!isOwnerLoggedIn || isPreviewMode) return;
       const id = document.getElementById('editItemId').value;
       closeEditModal();
       deleteRegistryItem(id);
     }
 
     function openEditModal(id) {
-      if (currentViewMode !== 'owner') return;
+      if (!isOwnerLoggedIn || isPreviewMode) return;
 
       const item = registryData.items.find(i => i.id === id);
       if (!item) return;
@@ -1589,6 +1848,7 @@
 
     editItemForm.addEventListener('submit', (e) => {
       e.preventDefault();
+      if (!isOwnerLoggedIn || isPreviewMode) return;
       const id = document.getElementById('editItemId').value;
       const item = registryData.items.find(i => i.id === id);
 
@@ -1627,7 +1887,9 @@
 
       item.funded = true;
       item.fundedBy = gifterName;
-      saveState();
+      if (isOwnerLoggedIn && !isPreviewMode) {
+        saveState();
+      }
 
       const venmoHandle = registryData.venmoHandle || "recipient";
       const noteText = `Gift for ${item.name} via regisTree`;
@@ -1655,7 +1917,9 @@
       if (item && item.funded) {
         item.funded = false;
         item.fundedBy = null;
-        saveState();
+        if (isOwnerLoggedIn && !isPreviewMode) {
+          saveState();
+        }
         renderRegistry();
       }
     }
